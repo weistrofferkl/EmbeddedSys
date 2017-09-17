@@ -1,0 +1,15 @@
+15:05:48 **** Incremental Build of configuration Default for project HW01-ReactionTime ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing main.xc
+Propagating analysis
+Creating dependencies for main.xc
+Compiling main.xc
+Creating HW01-ReactionTime.xe
+Build Complete
+15:05:54 **** Incremental Build of configuration Default for project HW01-ReactionTime ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete

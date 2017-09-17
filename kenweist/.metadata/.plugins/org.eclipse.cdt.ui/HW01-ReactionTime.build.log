@@ -1,0 +1,8 @@
+15:05:54 **** Incremental Build of configuration Default for project HW01-ReactionTime ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+15:05:55 Build Finished (took 516ms)
+

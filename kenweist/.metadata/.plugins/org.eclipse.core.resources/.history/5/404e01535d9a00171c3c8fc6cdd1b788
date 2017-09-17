@@ -1,0 +1,79 @@
+/*
+ * main.xc
+ *
+ *  Created on: Sep 14, 2017
+ *      Author: kenda
+ */
+#include <xs1.h>
+#include <stdio.h>
+
+in port iButton = XS1_PORT_32A; //32 bit vector
+out port oLed = XS1_PORT_1A;
+//unsigned value = 0b0;
+
+unsigned int compute_difference(unsigned int t0, unsigned int t1){
+
+    if(t1 > t0){
+        return (t1-t0);
+    }
+    return (t0-t1);
+
+
+}
+int main(){
+
+    int value;
+    int oldButton;
+    iButton :> value;
+    value = value&1;
+    timer tmr;
+    unsigned int t;
+    unsigned int t2;
+
+    while(1){
+
+        iButton :> oldButton;
+        oldButton = oldButton&1;
+        iButton when pinsneq(value) :> value;
+        value = value&1;
+
+        if(value == oldButton){}
+        else if (value < oldButton){
+            printf("HELLO LAME SHIT");
+            //want to turn on LED if value < oldValue
+            //as then we have a state change
+            oLed <: 1;
+            tmr :> t;
+        }
+
+        else {
+        //turn off LED
+
+            oLed <: 0;
+            tmr :> t2;
+            printf("%u\n", compute_difference(t,t2));
+        }
+
+
+
+    }
+}
+
+int main_sampling(){
+
+    while(1){
+        int value;
+        iButton :> value;
+        if (value%2==0){
+
+            oLed <: 1;
+        }
+        else {
+        //turn off LED
+
+            oLed <: 0;
+        }
+
+
+    }
+}

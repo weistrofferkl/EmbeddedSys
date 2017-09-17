@@ -1,0 +1,1 @@
+-I"../." -I".././kenweist" -I".././kenweist/Lab01-Hello" -I".././kenweist/Lab01-Hello/bin" -I".././kenweist/Lab01-Hello/src" -I".././src"

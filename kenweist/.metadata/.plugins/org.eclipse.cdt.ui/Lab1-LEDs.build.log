@@ -1,0 +1,11 @@
+15:52:56 **** Build of configuration Default for project Lab1-LEDs ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing main.xc
+xcc: error: multiple xn source files supplied (".././STARTKIT.xn") and (".././kenweist/Lab01-Hello/STARTKIT.xn")
+xmake[1]: *** [.build/main.xc.pca.xml.decouple] Error 1
+xmake: *** [analyze] Error 2
+
+15:52:57 Build Finished (took 722ms)
+

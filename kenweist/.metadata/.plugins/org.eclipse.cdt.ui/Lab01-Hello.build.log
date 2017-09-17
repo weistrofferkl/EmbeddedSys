@@ -1,0 +1,16 @@
+15:52:51 **** Build of configuration Default for project Lab01-Hello ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing main.xc
+Analyzing Lab01-Hello.xc
+Propagating analysis
+Creating dependencies for Lab01-Hello.xc
+Creating dependencies for main.xc
+Compiling main.xc
+Compiling Lab01-Hello.xc
+Creating Lab01-Hello.xe
+Build Complete
+
+15:52:53 Build Finished (took 2s.471ms)
+
