@@ -16,15 +16,14 @@ in port iButton = XS1_PORT_32A;
 out port oLed = XS1_PORT_1A;
 out port oLed2 = XS1_PORT_1D;
 int times[10];
-timer tmr;
 
 //Method from the lab used to compute the difference between two timestamps
 unsigned int compute_difference(unsigned int t0, unsigned int t1){
 
     if(t1 > t0){
-        return ((t1-t0));
+        return ((t1-t0))/100; //dividing by 100 to get the time in microseconds
     }
-    return ((t0-t1));
+    return (0xFFFFFFFF-(t0-t1))/100;
 }
 
 //Used to insert an element into a specific position within an array
@@ -48,15 +47,10 @@ int computeStats(int times[]){
         }
     }
 
-    for(i = 0; i<10;i++){
-        printf("\n");
-        printf("Array Pos %i %u\n", i,times[i]);
-    }
-
     //Grab desired stats:
     unsigned min = times[0];
     unsigned max = times[9];
-    unsigned median = times[5];
+    unsigned median = (times[4]+times[5])/2;
     unsigned avg = 0;
 
     //compute the avg.
@@ -66,6 +60,7 @@ int computeStats(int times[]){
     avg = avg/10;
 
     //print dat shit out!
+    printf("Stats in Microseconds: \n");
     printf("Min: %u\n", min);
     printf("Max: %u\n", max);
     printf("Median: %u\n", median);
@@ -75,7 +70,7 @@ int computeStats(int times[]){
 }
 
 //Used to toggle the 3 initial flashes at the beginning of each sequence
-unsigned int toggleLight(int flashes, int pattern){
+unsigned int toggleLight(int flashes, int pattern, timer tmr){
     unsigned int t;
     tmr :> t;
     unsigned int result;
@@ -101,12 +96,13 @@ int main(){
  unsigned diff;
  unsigned delay;
  unsigned pos = 0;
+ timer tmr;
 
  iButton :> value;
  tmr :> t;
  while(1){
     //3 initial flashes:
-    t = toggleLight(3, pattern);
+    t = toggleLight(3, pattern, tmr);
 
     //turn the LEDs on after the random delay has passed:
     delay = XS1_TIMER_HZ+rand()%XS1_TIMER_HZ;
@@ -126,16 +122,19 @@ int main(){
         //& save the difference:
         tmr :>t2;
         diff = compute_difference(t,t2);
-        printf("Diff Pos: %u %u\n", pos, diff);
 
         insertArray(diff, pos, times);
         pos++;
 
         //if we have seen 10 reaction-times, then we want to compute the stats
-        //and terminate(?):
+        //and then continue:
+        //Used this for debugging, may help with ensuring grading:
+        //printf("POS, DIFF: %u %u\n", pos, diff);
+
         if(pos == 10){
             computeStats(times);
-            break;
+            pos = 0;
+            //break;
         }
         //if we haven't seen the required 10 reactions, then we want to turn
         //off the LEDs and wait for a second before restarting the process:
