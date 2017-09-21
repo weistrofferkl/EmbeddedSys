@@ -11,7 +11,8 @@
 #include<stdlib.h>
 
 
-#define FLASH_DELAY (XS1_TIMER_HZ/2);
+#define FLASH_DELAY (XS1_TIMER_HZ/2)
+#define overflowConstant 0xFFFFFFFF
 in port iButton = XS1_PORT_32A;
 out port oLed = XS1_PORT_1A;
 out port oLed2 = XS1_PORT_1D;
@@ -23,7 +24,7 @@ unsigned int compute_difference(unsigned int t0, unsigned int t1){
     if(t1 > t0){
         return ((t1-t0))/100; //dividing by 100 to get the time in microseconds
     }
-    return (0xFFFFFFFF-(t0-t1))/100;
+    return (overflowConstant-(t0-t1))/100;
 }
 
 //Used to insert an element into a specific position within an array
