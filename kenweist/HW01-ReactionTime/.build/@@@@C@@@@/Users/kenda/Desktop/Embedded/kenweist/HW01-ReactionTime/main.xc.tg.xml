@@ -1,0 +1,37 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>compute_difference</name>
+  <inFunction>compute_difference</inFunction>
+</task>
+<task>
+  <name>insertArray</name>
+  <inFunction>insertArray</inFunction>
+</task>
+<task>
+  <name>computeStats</name>
+  <inFunction>computeStats</inFunction>
+</task>
+<task>
+  <name>toggleLight</name>
+  <inFunction>toggleLight</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+</taskgraph>

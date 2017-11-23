@@ -1,0 +1,8 @@
+14:32:40 **** Incremental Build of configuration Default for project HW06-RobotRC ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+14:32:41 Build Finished (took 1s.460ms)
+

@@ -1,0 +1,64 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>display_output</name>
+  <inFunction>display_output</inFunction>
+</task>
+<task>
+  <name>monitor_buttons</name>
+  <inFunction>monitor_buttons</inFunction>
+</task>
+<task>
+  <name>button_simulator</name>
+  <inFunction>button_simulator</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+<task>
+  <name>_task_display_output_0</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>display_output</calledFunction>
+  <core>1</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_monitor_buttons_1</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>monitor_buttons</calledFunction>
+  <core>2</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_button_simulator_2</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>button_simulator</calledFunction>
+  <core>3</core>
+  <inPar/>
+</task>
+<connection>
+  <ends>
+    <end task="_task_display_output_0" type="chan"/>
+    <end task="_task_monitor_buttons_1" type="chan"/>
+  </ends>
+  <name>c1</name>
+</connection>
+</taskgraph>

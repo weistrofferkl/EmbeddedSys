@@ -1,0 +1,13 @@
+21:49:40 **** Build of configuration Default for project Lab06-HelloNodeMCU ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing Lab06-HelloNodeMCU.xc
+Propagating analysis
+Creating dependencies for Lab06-HelloNodeMCU.xc
+Compiling Lab06-HelloNodeMCU.xc
+Creating Lab06-HelloNodeMCU.xe
+Build Complete
+
+21:49:44 Build Finished (took 3s.540ms)
+

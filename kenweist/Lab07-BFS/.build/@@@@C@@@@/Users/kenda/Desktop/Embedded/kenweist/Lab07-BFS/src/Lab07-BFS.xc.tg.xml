@@ -1,0 +1,19 @@
+<taskgraph>
+<task>
+  <name>_safe_memcmp</name>
+  <inFunction>_safe_memcmp</inFunction>
+</task>
+<task>
+  <name>_safe_memmove</name>
+  <inFunction>_safe_memmove</inFunction>
+</task>
+<task>
+  <name>_safe_memset</name>
+  <inFunction>_safe_memset</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+  <endOfSeqCalledFunction>find_shortest_path</endOfSeqCalledFunction>
+</task>
+</taskgraph>

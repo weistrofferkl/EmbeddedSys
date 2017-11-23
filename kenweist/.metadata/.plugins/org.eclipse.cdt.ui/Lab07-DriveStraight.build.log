@@ -1,0 +1,12 @@
+20:00:42 **** Incremental Build of configuration Default for project Lab07-DriveStraight ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing Lab07-DriveStraight.xc
+Creating dependencies for Lab07-DriveStraight.xc
+Compiling Lab07-DriveStraight.xc
+Creating Lab07-DriveStraight.xe
+Build Complete
+
+20:00:48 Build Finished (took 5s.752ms)
+

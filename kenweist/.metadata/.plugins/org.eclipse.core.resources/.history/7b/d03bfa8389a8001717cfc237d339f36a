@@ -1,0 +1,190 @@
+/*
+ * HW03-Ping.xc
+ *
+ *  Created on: Oct 3, 2017
+ *      Author: kenda
+ */
+
+#include <xs1.h>
+#include <print.h>
+#include <stdio.h>
+
+//constants
+const unsigned int NUM_SAMPLES=3; //Number of test cases
+const unsigned int SAMPLES_MM[] = {1000, 5000, 10000}; //values in millimeters that the ping simulator will emulate
+
+//speed of sound at sea level: 340.29 mm/s (millimeters per second)
+const unsigned int SOUND_MM_PER_SECOND = 340290; //this is in miliseconds
+const unsigned int SOUND_MM_PER_SECOND_IN_US = 340290000; //above but in microseconds
+
+//ports
+port ioPingPort = XS1_PORT_1A;
+port ioPingSimulator = XS1_PORT_1B;
+
+#define TICKS_PER_US (XS1_TIMER_HZ/1000000)
+#define TICKS_PER_5US (5*(XS1_TIMER_HZ/1000000))
+#define overflowConstant 0xFFFFFFFF
+#define TICKS_PER_SEC XS1_TIMER_HZ
+
+unsigned int compute_difference(unsigned int t0, unsigned int t1){
+
+    if(t1 > t0){
+        return ((t1-t0)); //dividing by 100 to get the time in microseconds (US)
+    }
+    return (overflowConstant-(t0-t1));
+}
+
+
+//prototypes (alphabetical)
+void distance_consumer(chanend c){
+    //should iterate num_samples times.
+        //in each:
+        //read an int distance value from channel
+        //use sprintf & printstrln to print out distance
+
+    unsigned int dist;
+    char buffer[64];
+
+    for(int i = 0; i < NUM_SAMPLES; i++){
+        c :> dist;
+
+        sprintf(buffer, "Distance: %i\n", dist);
+        printstrln(buffer);
+    }
+}
+void ping_task(port p, chanend c){
+    timer tmr;
+    unsigned t;
+    unsigned t1;
+    unsigned t2;
+    int dist, dist_mm;
+
+    //iterate num_samples times
+        //in each:
+        //implement basic PING protocol
+
+    //wait for pins to be low
+    p when pinseq(0) :> void;
+    for(int i  = 0; i< NUM_SAMPLES; i++){
+
+
+        //emit short burst
+
+        p <: 1;
+        tmr :> t;
+
+        //wait for tOut time
+
+        t += TICKS_PER_5US;
+
+        tmr when timerafter(t):> t;
+
+        //send termation pulse
+        p <: 0;
+        p :> void;
+
+        p when pinseq(1) :> void;
+        tmr :> t1;
+
+        p when pinseq(0) :> void;
+        tmr :> t2;
+
+        //difference between start/end time stamps over sound per US
+        dist = compute_difference(t1,t2);
+        dist = dist/2;
+        dist_mm = dist/(TICKS_PER_SEC/SOUND_MM_PER_SECOND);
+
+        c <: dist_mm;
+
+
+    }
+
+}
+
+
+void ping_task_timeout(port p, chanend c, unsigned int timeout_ticks){
+    timer tmr;
+    unsigned t;
+    unsigned t1;
+    unsigned t2;
+    int dist, dist_mm;
+
+
+
+    //wait for pins to be low
+    p when pinseq(0) :> void;
+    for(int i  = 0; i< NUM_SAMPLES; i++){
+
+
+        //emit short burst
+
+        p <: 1;
+        tmr :> t;
+
+        //wait for tOut time
+
+        t += TICKS_PER_5US;
+
+        tmr when timerafter(t):> t;
+
+        //send termation pulse
+        p <: 0;
+        p :> void;
+
+
+        select{
+
+            case p when pinseq(1) :> void:
+               tmr :> t1;
+
+            case p when pinseq(0) :> void:
+                tmr :> t2;
+
+            case tmr :> t :
+
+                orgT += t
+                if (t+orgT == timeout_ticks){
+
+                   char buffer[64];
+                   spritf(buffer, "TIMEOUT");
+                   printstrln(buffer);
+                }
+                    break;
+
+
+
+
+        }
+
+        //difference between start/end time stamps over sound per US
+        dist = compute_difference(t1,t2);
+        dist = dist/2;
+        dist_mm = dist/(TICKS_PER_SEC/SOUND_MM_PER_SECOND);
+
+        c <: dist_mm;
+
+
+    }
+
+}
+
+//defined in parallax_ping.xc
+void ping_simulator(
+        port p,
+        const unsigned int mms[],
+        const unsigned int n_mms,
+        unsigned int mm_per_second);
+
+int main(void){
+    chan c;
+    par{
+        ping_task(ioPingPort, c);
+        distance_consumer(c);
+        ping_simulator(ioPingSimulator,
+                SAMPLES_MM,
+                NUM_SAMPLES,
+                SOUND_MM_PER_SECOND);
+    }
+    return 0;
+}
+

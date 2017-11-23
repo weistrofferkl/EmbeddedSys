@@ -1,0 +1,8 @@
+18:00:43 **** Incremental Build of configuration Default for project Lab07-Turn90 ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+18:00:44 Build Finished (took 1s.649ms)
+

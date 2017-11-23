@@ -1,0 +1,175 @@
+/*
+ * Lab06-HelloNodeMCU.xc
+ *
+ *  Created on: Oct 20, 2017
+ *      Author: kenda
+ */
+#include <xs1.h>
+#include <stdio.h>
+#include <print.h>
+#include <string.h>
+out port oLED = XS1_PORT_1A;
+out port oWiFiRX = XS1_PORT_1F; //send data
+in port iWiFiTX = XS1_PORT_1H; //receive data
+
+#define BAUDRATE 9600
+#define BIT_TIME 100000000/BAUDRATE
+#define BUFFER_LENGTH 100
+#define LINE_DELAY XS1_TIMER_HZ/8
+
+
+void uart_transmit_byte(out port oPort, char value, unsigned int baudrate){
+    timer tmr;
+    unsigned t;
+    tmr :> t;
+
+    //output start-bit
+    oPort <: 0;
+    t+= BIT_TIME;
+    tmr when timerafter(t) :> void;
+
+    for(int i = 0; i < 8; i++){
+        oPort <: >> value;
+        t += BIT_TIME;
+        tmr when timerafter(t) :> void;
+    }
+
+
+    oPort <: 1;
+    t += BIT_TIME;
+    tmr when timerafter(t) :> void;
+
+}
+
+char uart_receive_byte(in port iPort, unsigned int baudrate){
+    timer tmr;
+    unsigned t;
+    char value;
+    tmr :> t;
+
+    iPort when pinseq(0) :> void;
+    tmr :> t;
+    t += BIT_TIME/2;
+
+    for(int i = 0; i < 8; i++){
+        t += BIT_TIME;
+        tmr when timerafter(t) :> void;
+        iPort :> >>value;
+    }
+
+    t += BIT_TIME;
+    tmr when timerafter(t) :> void;
+    iPort :> void;
+    return value;
+
+}
+
+void uart_transmit_bytes(out port oPort, const char values[], unsigned int baudrate){
+
+    int i = 0;
+    while(values[i] != '\0'){
+        uart_transmit_byte(oPort,values[i],baudrate);
+        i++;
+    }
+
+}
+
+void toggle_port(out port oLED, unsigned int hz){
+    timer tmr;
+    unsigned t;
+    int periodLength = hz * XS1_TIMER_HZ; //hz = cycles per second
+
+    oLED <: 0;
+    while(1){
+        oLED <: 1;
+        tmr :> t;
+        t += (periodLength/2);
+        tmr when timerafter(t):> void;
+        oLED <: 0;
+
+        tmr :> t;
+        t+= (periodLength/2);
+        tmr when timerafter(t) :> void;
+
+    }
+
+}
+
+void uart_to_console_task(chanend trigger_chan){
+    char charArray[BUFFER_LENGTH];
+    char holder;
+    int i = 0;
+
+    while(1){
+        holder = uart_receive_byte(iWiFiTX, BAUDRATE);
+
+        if(holder == '\n' || holder == '\r\n'){
+            holder = '\0';
+        }
+        if(strcmp(charArray, "lua: cannot open init.lua") == 0){
+            trigger_chan <: 0;
+        }
+        if(i == BUFFER_LENGTH-1 || holder == '\0'){
+            charArray[i] = holder;
+            printstrln(charArray);
+            i = 0;
+
+        }
+        else{
+            charArray[i] = holder;
+            i++;
+        }
+    }
+}
+
+void line(const char buffer[]){
+    char newBuffer[BUFFER_LENGTH+1];
+    timer tmr;
+    int t;
+
+    for(int i = 0; i< BUFFER_LENGTH+1 ; i++){
+        if(i = BUFFER_LENGTH){
+            newBuffer[i] = '\r\n';
+        }
+        else{
+            newBuffer[i] = buffer[i];
+        }
+    }
+
+    tmr :> t;
+    t+=LINE_DELAY;
+
+
+
+    tmr when timerafter(t):> void;
+  //  newBuffer = buffer + '\r\n';
+    uart_transmit_bytes(oWiFiRX,newBuffer, BAUDRATE);
+
+}
+
+void send_hello_world_program(){
+    line("gpio.mode(3, gpio.OUTPUT)");
+    line("while 1 do");
+    line("gpio.write(3, gpio.HIGH)");
+    line("tmr.delay(1000000)");
+    line("gpio.write(3, gpio.LOW)");
+    line("tmr.delat(1000000)");
+    line("end");
+}
+void program_board_task(chanend trigger_chan){
+    unsigned holder;
+    while(1){
+        trigger_chan :> holder;
+        send_hello_world_program();
+
+    }
+}
+int main(){
+
+    oWiFiRX <: 1; //set high for default state
+    par{
+        toggle_port(oLED, 2);
+        uart_to_console_task(iWiFiRX);
+        program_board_task(iWiFiRX);
+    }
+}

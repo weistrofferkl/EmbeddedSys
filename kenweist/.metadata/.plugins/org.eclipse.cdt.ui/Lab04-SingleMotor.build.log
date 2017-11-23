@@ -1,0 +1,8 @@
+11:47:40 **** Incremental Build of configuration Default for project Lab04-SingleMotor ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+11:47:40 Build Finished (took 802ms)
+

@@ -1,0 +1,24 @@
+14:06:36 **** Incremental Build of configuration Default for project Lab07-BFS ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing bfs.c
+../src/bfs.c:531:22: error: array type 'int [25]' is not assignable
+            commands = convert_commands(&list, commands);
+            ~~~~~~~~ ^
+../src/bfs.c:539:5: error: conflicting types for 'convert_commands'
+int convert_commands(list_t* ranks, int commands[]){
+    ^
+../src/bfs.c:40:6: note: previous declaration is here
+void convert_commands(list_t* ranks, int commands[]);
+     ^
+../src/bfs.c:695:12: warning: incompatible pointer to integer conversion returning 'int *' from a function with result type 'int'; dereference with * [-Wint-conversion]
+    return commands;
+           ^~~~~~~~
+           *
+1 warning and 2 errors generated.
+xmake[1]: *** [.build/src/bfs.c.pca.xml.decouple] Error 1
+xmake: *** [analyze] Error 2
+
+14:06:38 Build Finished (took 1s.864ms)
+

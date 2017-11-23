@@ -1,0 +1,245 @@
+/*
+ * bfs.c
+ *
+ *  Created on: Oct 30, 2017
+ *      Author: kenda
+ */
+#include <assert.h>
+#include <stdlib.h>
+#include "bfs.h"
+
+
+//Linked List Structure declared as described:
+struct list_element_t_struct;
+
+struct list_element_t_struct{
+    int rank;
+    struct list_element_t_struct*next;
+};
+
+typedef struct list_element_t_struct list_element_t;
+
+typedef struct{
+    list_element_t *head;
+    list_element_t *tail;
+}list_t;
+
+
+void push_back(list_t* list, int rank);
+void free_list(list_t* list);
+int remove_front(list_t* list);
+void push_front(list_t* list, int rank);
+void fill_neighbors(int neighbors[], int rank);
+
+
+list_t init_list(){
+
+    list_t newListEle;
+
+    //init_list() sets head and tail to NULL
+    newListEle.head = NULL;
+    newListEle.tail = NULL;
+
+    return newListEle;
+}
+
+void push_back(list_t* list, int rank){
+    list_element_t* tmp;
+    list_element_t* holder;
+
+    //creates a new node with specified rank:
+    tmp = (list_element_t*)malloc(sizeof(list_element_t));
+    assert(tmp != NULL);
+    tmp->rank = rank;
+    tmp->next = NULL;
+
+    //Appends that node to the end of the list:
+    if(list->head == NULL && list->tail == NULL){
+        list->head = tmp;
+        list->tail = tmp;
+    }
+    else{
+        holder = list->head;
+        while(holder != NULL){
+            if(holder->next == NULL){
+                holder->next = tmp;
+                list->tail = tmp;
+                break;
+            }
+            else{
+                holder = holder->next;
+            }
+        }
+    }
+}
+
+void free_list(list_t* list){
+    list_element_t* holder;
+    list_element_t* tmp;
+    holder = list->head;
+
+    //loops over and frees all list elements & updates list structure:
+    while(holder->next != NULL){
+
+            tmp = holder->next;
+            free(holder);
+            holder = tmp;
+
+    }
+    free(holder);
+    *list = init_list();
+
+
+}
+
+int remove_front(list_t* list){
+    //if list is empty return -1
+    //remove first element
+    //deallocate that memory for first element
+    //fix head and tail pointers
+    //if last element is removed then reinitalize list
+
+    list_element_t* tmp;
+    tmp = list->head;
+
+    if(tmp == NULL){
+        return -1;
+    }
+    //removes/frees the first element of the list and updates structure correctly:
+    else if (tmp->next == NULL){
+        list->head = NULL;
+        list->tail = NULL;
+        free(tmp);
+        *list = init_list();
+    }
+    else{
+        list->head = tmp->next;
+        free(tmp);
+    }
+    return 0;
+}
+
+void push_front(list_t* list, int rank){
+    //creates new node with speficied rank:
+    list_element_t* tmp;
+    tmp = (list_element_t*)malloc(sizeof(list_element_t));
+    tmp->rank = rank;
+    tmp->next = NULL;
+
+    //appends that node to front of list:
+    if(list->head == NULL && list->tail == NULL){
+        list->head = tmp;
+        list->tail = tmp;
+    }
+    else{
+        tmp->next = list->head;
+        list->head = tmp;
+    }
+}
+
+void fill_neighbors(int neighbors[], int rank){
+    //0 = top
+    //1 = bottom
+    //2 = left
+    //3 = right
+
+    int row = ROW(rank);
+    int col = COL(rank);
+  //  int top,bottom,left,right;
+
+    //Retrieves top,bottom,left,right neighbors of speficied node:
+    //top
+    if(row == 0){
+        neighbors[0] = -1;
+    }
+    else{
+        neighbors[0] = RANK(row-1, col);
+    }
+
+    //bottom
+    if(row == 9){
+        neighbors[1] = -1;
+    }
+    else{
+        neighbors[1] = RANK(row+1, col);
+    }
+
+    //left
+    if(col == 0){
+        neighbors[2] = -1;
+    }
+    else{
+        neighbors[2] = RANK(row, col-1);
+    }
+
+    //right
+    if(col == 9){
+        neighbors[3] = -1;
+    }
+    else{
+        neighbors[3] = RANK(row, col+1);
+    }
+}
+int test_main(){
+
+
+    list_t l1;
+    l1 = init_list();
+
+ //  int neighborTest[4];
+
+ //Appropriate test cases written for each function:
+
+
+   // l1 = init_list();
+  //  assert(l1.head == l1.tail && l1.head == NULL);
+
+
+ /*   l1 = init_list();
+    push_back(&l1, 10);
+    assert(l1.head != NULL);
+    assert(l1.tail == l1.head);
+    assert(l1.head->rank == 10);
+    assert(l1.head->next == NULL);
+
+    push_back(&l1, 20);
+    assert(l1.head != l1.tail);
+    assert(l1.head->rank == 10);
+    assert(l1.head->next == l1.tail);
+    assert(l1.tail->rank == 20);
+    assert(l1.tail->next == NULL);
+ */
+   /* l1 = init_list();
+    push_back(&l1, 10);
+    push_back(&l1, 20);
+    push_back(&l1, 30);
+    free_list(&l1);
+    assert(l1.head == NULL && l1.tail == l1.head);
+    */
+
+  /*  push_back(&l1, 10);
+    push_back(&l1, 20);
+    push_back(&l1, 30);
+    remove_front(&l1);
+    assert(l1.head->rank == 20);
+    remove_front(&l1);
+    assert(l1.head->rank == 30);
+    remove_front(&l1);
+    assert(l1.head == NULL && l1.tail == l1.head);
+    */
+ /*   push_back(&l1, 10);
+ //   push_back(&l1, 20);
+ //   push_back(&l1, 30);
+    push_front(&l1, 40);
+    assert(l1.head->rank == 40 && l1.tail == l1.head);
+    assert(l1.tail->rank == 40);*/
+
+  /*  fill_neighbors(neighborTest, RANK(7,7));
+    assert(neighborTest[0] != -1);
+    assert(neighborTest[2] != -1);
+    assert(neighborTest[1] != -1);
+    assert(neighborTest[3] != -1);
+    */
+
+    return 0;
+}

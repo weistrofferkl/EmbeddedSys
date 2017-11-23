@@ -1,0 +1,892 @@
+$date
+  Mon Oct 02 23:41:02 2017
+$end
+
+$version
+  Xcore C-Simulator + VcdTrace plugin (interface version: 1.8)
+$end
+
+$timescale
+  2.000000 ns
+$end
+
+$comment
+<?xml version="1.0" encoding="UTF-8"?>
+<Structure>
+    <Date value="Mon Oct 02 23:41:02 2017"/>
+    <Hierarchy>
+    <Category name="Pads">
+        <Signal name="0_X0D00" radix="HEX"/>
+        <Signal name="0_X0D01" radix="HEX"/>
+        <Signal name="0_X0D02" radix="HEX"/>
+        <Signal name="0_X0D03" radix="HEX"/>
+        <Signal name="0_X0D04" radix="HEX"/>
+        <Signal name="0_X0D05" radix="HEX"/>
+        <Signal name="0_X0D06" radix="HEX"/>
+        <Signal name="0_X0D07" radix="HEX"/>
+        <Signal name="0_X0D08" radix="HEX"/>
+        <Signal name="0_X0D09" radix="HEX"/>
+        <Signal name="0_X0D10" radix="HEX"/>
+        <Signal name="0_X0D11" radix="HEX"/>
+        <Signal name="0_X0D12" radix="HEX"/>
+        <Signal name="0_X0D13" radix="HEX"/>
+        <Signal name="0_X0D14" radix="HEX"/>
+        <Signal name="0_X0D15" radix="HEX"/>
+        <Signal name="0_X0D16" radix="HEX"/>
+        <Signal name="0_X0D17" radix="HEX"/>
+        <Signal name="0_X0D18" radix="HEX"/>
+        <Signal name="0_X0D19" radix="HEX"/>
+        <Signal name="0_X0D20" radix="HEX"/>
+        <Signal name="0_X0D21" radix="HEX"/>
+        <Signal name="0_X0D22" radix="HEX"/>
+        <Signal name="0_X0D23" radix="HEX"/>
+        <Signal name="0_X0D24" radix="HEX"/>
+        <Signal name="0_X0D25" radix="HEX"/>
+        <Signal name="0_X0D26" radix="HEX"/>
+        <Signal name="0_X0D27" radix="HEX"/>
+        <Signal name="0_X0D28" radix="HEX"/>
+        <Signal name="0_X0D29" radix="HEX"/>
+        <Signal name="0_X0D30" radix="HEX"/>
+        <Signal name="0_X0D31" radix="HEX"/>
+        <Signal name="0_X0D32" radix="HEX"/>
+        <Signal name="0_X0D33" radix="HEX"/>
+        <Signal name="0_X0D34" radix="HEX"/>
+        <Signal name="0_X0D35" radix="HEX"/>
+        <Signal name="0_X0D36" radix="HEX"/>
+        <Signal name="0_X0D37" radix="HEX"/>
+        <Signal name="0_X0D38" radix="HEX"/>
+        <Signal name="0_X0D39" radix="HEX"/>
+        <Signal name="0_X0D40" radix="HEX"/>
+        <Signal name="0_X0D41" radix="HEX"/>
+        <Signal name="0_X0D42" radix="HEX"/>
+        <Signal name="0_X0D43" radix="HEX"/>
+        <Signal name="0_X0D49" radix="HEX"/>
+        <Signal name="0_X0D50" radix="HEX"/>
+        <Signal name="0_X0D51" radix="HEX"/>
+        <Signal name="0_X0D52" radix="HEX"/>
+        <Signal name="0_X0D53" radix="HEX"/>
+        <Signal name="0_X0D54" radix="HEX"/>
+        <Signal name="0_X0D55" radix="HEX"/>
+        <Signal name="0_X0D56" radix="HEX"/>
+        <Signal name="0_X0D57" radix="HEX"/>
+        <Signal name="0_X0D58" radix="HEX"/>
+        <Signal name="0_X0D61" radix="HEX"/>
+        <Signal name="0_X0D62" radix="HEX"/>
+        <Signal name="0_X0D63" radix="HEX"/>
+        <Signal name="0_X0D64" radix="HEX"/>
+        <Signal name="0_X0D65" radix="HEX"/>
+        <Signal name="0_X0D66" radix="HEX"/>
+        <Signal name="0_X0D67" radix="HEX"/>
+        <Signal name="0_X0D68" radix="HEX"/>
+        <Signal name="0_X0D69" radix="HEX"/>
+        <Signal name="0_X0D70" radix="HEX"/>
+    </Category>
+    </Hierarchy>
+    <ValueAliases>
+    </ValueAliases>
+    <SignalDocs>
+        <SignalDoc name=".*Pad\d+" description="The value on the pad">
+            <ValueDocs>
+            </ValueDocs>
+        </SignalDoc>
+    </SignalDocs>
+    <SignalAliases>
+        <SignalAliasMap coreName="tile[0]">
+            <Entry name="XS1_PORT_1A" alias="PORT_SPI_MISO"/>
+            <Entry name="XS1_PORT_1B" alias="PORT_SPI_SS"/>
+            <Entry name="XS1_PORT_1C" alias="PORT_SPI_CLK"/>
+            <Entry name="XS1_PORT_1D" alias="PORT_SPI_MOSI"/>
+        </SignalAliasMap>
+    </SignalAliases>
+</Structure>
+$end
+
+$var wire 1 paa0 0_X0D00 $end
+$var wire 1 paa1 0_X0D01 $end
+$var wire 1 paa2 0_X0D02 $end
+$var wire 1 paa3 0_X0D03 $end
+$var wire 1 paa4 0_X0D04 $end
+$var wire 1 paa5 0_X0D05 $end
+$var wire 1 paa6 0_X0D06 $end
+$var wire 1 paa7 0_X0D07 $end
+$var wire 1 paa8 0_X0D08 $end
+$var wire 1 paa9 0_X0D09 $end
+$var wire 1 paa10 0_X0D10 $end
+$var wire 1 paa11 0_X0D11 $end
+$var wire 1 paa12 0_X0D12 $end
+$var wire 1 paa13 0_X0D13 $end
+$var wire 1 paa14 0_X0D14 $end
+$var wire 1 paa15 0_X0D15 $end
+$var wire 1 paa16 0_X0D16 $end
+$var wire 1 paa17 0_X0D17 $end
+$var wire 1 paa18 0_X0D18 $end
+$var wire 1 paa19 0_X0D19 $end
+$var wire 1 paa20 0_X0D20 $end
+$var wire 1 paa21 0_X0D21 $end
+$var wire 1 paa22 0_X0D22 $end
+$var wire 1 paa23 0_X0D23 $end
+$var wire 1 paa24 0_X0D24 $end
+$var wire 1 paa25 0_X0D25 $end
+$var wire 1 paa26 0_X0D26 $end
+$var wire 1 paa27 0_X0D27 $end
+$var wire 1 paa28 0_X0D28 $end
+$var wire 1 paa29 0_X0D29 $end
+$var wire 1 paa30 0_X0D30 $end
+$var wire 1 paa31 0_X0D31 $end
+$var wire 1 paa32 0_X0D32 $end
+$var wire 1 paa33 0_X0D33 $end
+$var wire 1 paa34 0_X0D34 $end
+$var wire 1 paa35 0_X0D35 $end
+$var wire 1 paa36 0_X0D36 $end
+$var wire 1 paa37 0_X0D37 $end
+$var wire 1 paa38 0_X0D38 $end
+$var wire 1 paa39 0_X0D39 $end
+$var wire 1 paa40 0_X0D40 $end
+$var wire 1 paa41 0_X0D41 $end
+$var wire 1 paa42 0_X0D42 $end
+$var wire 1 paa43 0_X0D43 $end
+$var wire 1 paa44 0_X0D49 $end
+$var wire 1 paa45 0_X0D50 $end
+$var wire 1 paa46 0_X0D51 $end
+$var wire 1 paa47 0_X0D52 $end
+$var wire 1 paa48 0_X0D53 $end
+$var wire 1 paa49 0_X0D54 $end
+$var wire 1 paa50 0_X0D55 $end
+$var wire 1 paa51 0_X0D56 $end
+$var wire 1 paa52 0_X0D57 $end
+$var wire 1 paa53 0_X0D58 $end
+$var wire 1 paa54 0_X0D61 $end
+$var wire 1 paa55 0_X0D62 $end
+$var wire 1 paa56 0_X0D63 $end
+$var wire 1 paa57 0_X0D64 $end
+$var wire 1 paa58 0_X0D65 $end
+$var wire 1 paa59 0_X0D66 $end
+$var wire 1 paa60 0_X0D67 $end
+$var wire 1 paa61 0_X0D68 $end
+$var wire 1 paa62 0_X0D69 $end
+$var wire 1 paa63 0_X0D70 $end
+
+$enddefinitions $end
+
+$dumpvars
+0paa0
+0paa1
+0paa2
+0paa3
+0paa4
+0paa5
+0paa6
+0paa7
+0paa8
+0paa9
+0paa10
+0paa11
+0paa12
+0paa13
+0paa14
+0paa15
+0paa16
+0paa17
+0paa18
+0paa19
+0paa20
+0paa21
+0paa22
+0paa23
+0paa24
+0paa25
+0paa26
+0paa27
+0paa28
+0paa29
+0paa30
+0paa31
+0paa32
+0paa33
+0paa34
+0paa35
+0paa36
+0paa37
+0paa38
+0paa39
+0paa40
+0paa41
+0paa42
+0paa43
+0paa44
+0paa45
+0paa46
+0paa47
+0paa48
+0paa49
+0paa50
+0paa51
+0paa52
+0paa53
+0paa54
+0paa55
+0paa56
+0paa57
+0paa58
+0paa59
+0paa60
+0paa61
+0paa62
+0paa63
+$end
+
+#3053
+1paa12
+
+#3054
+1paa13
+
+#3808
+0paa12
+
+#3809
+0paa13
+
+#21188
+1paa12
+
+#21189
+1paa13
+
+#25528
+0paa12
+
+#25529
+0paa13
+
+#34208
+1paa12
+
+#34209
+1paa13
+
+#38548
+0paa12
+
+#38549
+0paa13
+
+#42888
+1paa12
+
+#42889
+1paa13
+
+#47318
+0paa12
+
+#47319
+0paa13
+
+#51678
+1paa12
+
+#51679
+1paa13
+
+#56018
+0paa12
+
+#56019
+0paa13
+
+#60358
+1paa12
+
+#60359
+1paa13
+
+#64698
+0paa12
+
+#64699
+0paa13
+
+#73378
+1paa12
+
+#73379
+1paa13
+
+#82058
+0paa12
+
+#82059
+0paa13
+
+#86398
+1paa12
+
+#86399
+1paa13
+
+#90828
+0paa12
+
+#90829
+0paa13
+
+#103868
+1paa12
+
+#103869
+1paa13
+
+#112548
+0paa12
+
+#112549
+0paa13
+
+#116888
+1paa12
+
+#116889
+1paa13
+
+#125568
+0paa12
+
+#125569
+0paa13
+
+#129908
+1paa12
+
+#129909
+1paa13
+
+#134338
+0paa12
+
+#134339
+0paa13
+
+#147378
+1paa12
+
+#147379
+1paa13
+
+#156058
+0paa12
+
+#156059
+0paa13
+
+#160398
+1paa12
+
+#160399
+1paa13
+
+#169078
+0paa12
+
+#169079
+0paa13
+
+#173418
+1paa12
+
+#173419
+1paa13
+
+#177848
+0paa12
+
+#177849
+0paa13
+
+#182208
+1paa12
+
+#182209
+1paa13
+
+#199568
+0paa12
+
+#199569
+0paa13
+
+#203908
+1paa12
+
+#203909
+1paa13
+
+#212588
+0paa12
+
+#212589
+0paa13
+
+#216928
+1paa12
+
+#216929
+1paa13
+
+#221358
+0paa12
+
+#221359
+0paa13
+
+#234398
+1paa12
+
+#234399
+1paa13
+
+#243078
+0paa12
+
+#243079
+0paa13
+
+#247418
+1paa12
+
+#247419
+1paa13
+
+#251758
+0paa12
+
+#251759
+0paa13
+
+#260438
+1paa12
+
+#260439
+1paa13
+
+#264868
+0paa12
+
+#264869
+0paa13
+
+#290928
+1paa12
+
+#290929
+1paa13
+
+#295268
+0paa12
+
+#295269
+0paa13
+
+#303948
+1paa12
+
+#303949
+1paa13
+
+#308378
+0paa12
+
+#308379
+0paa13
+
+#312738
+1paa12
+
+#312739
+1paa13
+
+#321418
+0paa12
+
+#321419
+0paa13
+
+#338778
+1paa12
+
+#338779
+1paa13
+
+#343118
+0paa12
+
+#343119
+0paa13
+
+#347458
+1paa12
+
+#347459
+1paa13
+
+#351888
+0paa12
+
+#351889
+0paa13
+
+#364928
+1paa12
+
+#364929
+1paa13
+
+#373608
+0paa12
+
+#373609
+0paa13
+
+#377948
+1paa12
+
+#377949
+1paa13
+
+#386628
+0paa12
+
+#386629
+0paa13
+
+#390968
+1paa12
+
+#390969
+1paa13
+
+#395398
+0paa12
+
+#395399
+0paa13
+
+#399758
+1paa12
+
+#399759
+1paa13
+
+#404098
+0paa12
+
+#404099
+0paa13
+
+#408438
+1paa12
+
+#408439
+1paa13
+
+#412778
+0paa12
+
+#412779
+0paa13
+
+#421458
+1paa12
+
+#421459
+1paa13
+
+#430138
+0paa12
+
+#430139
+0paa13
+
+#434478
+1paa12
+
+#434479
+1paa13
+
+#438908
+0paa12
+
+#438909
+0paa13
+
+#447608
+1paa12
+
+#447609
+1paa13
+
+#456288
+0paa12
+
+#456289
+0paa13
+
+#460628
+1paa12
+
+#460629
+1paa13
+
+#473648
+0paa12
+
+#473649
+0paa13
+
+#477988
+1paa12
+
+#477989
+1paa13
+
+#482418
+0paa12
+
+#482419
+0paa13
+
+#486778
+1paa12
+
+#486779
+1paa13
+
+#491118
+0paa12
+
+#491119
+0paa13
+
+#495458
+1paa12
+
+#495459
+1paa13
+
+#499798
+0paa12
+
+#499799
+0paa13
+
+#508478
+1paa12
+
+#508479
+1paa13
+
+#517158
+0paa12
+
+#517159
+0paa13
+
+#521498
+1paa12
+
+#521499
+1paa13
+
+#525928
+0paa12
+
+#525929
+0paa13
+
+#538968
+1paa12
+
+#538969
+1paa13
+
+#547648
+0paa12
+
+#547649
+0paa13
+
+#551988
+1paa12
+
+#551989
+1paa13
+
+#560668
+0paa12
+
+#560669
+0paa13
+
+#565008
+1paa12
+
+#565009
+1paa13
+
+#569438
+0paa12
+
+#569439
+0paa13
+
+#573798
+1paa12
+
+#573799
+1paa13
+
+#578138
+0paa12
+
+#578139
+0paa13
+
+#595498
+1paa12
+
+#595499
+1paa13
+
+#604178
+0paa12
+
+#604179
+0paa13
+
+#608518
+1paa12
+
+#608519
+1paa13
+
+#612948
+0paa12
+
+#612949
+0paa13
+
+#621648
+1paa12
+
+#621649
+1paa13
+
+#634668
+0paa12
+
+#634669
+0paa13
+
+#639008
+1paa12
+
+#639009
+1paa13
+
+#647688
+0paa12
+
+#647689
+0paa13
+
+#652028
+1paa12
+
+#652029
+1paa13
+
+#656458
+0paa12
+
+#656459
+0paa13
+
+#669498
+1paa12
+
+#669499
+1paa13
+
+#673838
+0paa12
+
+#673839
+0paa13
+
+#682518
+1paa12
+
+#682519
+1paa13
+
+#691198
+0paa12
+
+#691199
+0paa13
+
+#695538
+1paa12
+
+#695539
+1paa13
+
+#699968
+0paa12
+
+#699969
+0paa13
+
+#708668
+1paa12
+
+#708669
+1paa13
+
+#721688
+0paa12
+
+#721689
+0paa13
+
+#726028
+1paa12
+
+#726029
+1paa13
+
+#730368
+0paa12
+
+#730369
+0paa13
+
+#739048
+1paa12
+
+#739049
+1paa13
+
+#743478
+0paa12
+
+#743479
+0paa13
+
+#782558
+1paa12
+
+#782559
+1paa13
+
+#788059

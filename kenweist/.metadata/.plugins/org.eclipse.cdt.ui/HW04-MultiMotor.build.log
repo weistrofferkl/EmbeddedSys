@@ -1,0 +1,13 @@
+09:25:52 **** Incremental Build of configuration Default for project HW04-MultiMotor ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing HW04-MultiMotor.xc
+Propagating analysis
+Creating dependencies for HW04-MultiMotor.xc
+Compiling HW04-MultiMotor.xc
+Creating HW04-MultiMotor.xe
+Build Complete
+
+09:25:54 Build Finished (took 1s.989ms)
+

@@ -1,0 +1,68 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>compute_difference</name>
+  <inFunction>compute_difference</inFunction>
+</task>
+<task>
+  <name>distance_consumer</name>
+  <inFunction>distance_consumer</inFunction>
+</task>
+<task>
+  <name>ping_task</name>
+  <inFunction>ping_task</inFunction>
+</task>
+<task>
+  <name>ping_task_timeout</name>
+  <inFunction>ping_task_timeout</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+<task>
+  <name>_task_ping_task_timeout_0</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>ping_task_timeout</calledFunction>
+  <core>1</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_distance_consumer_1</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>distance_consumer</calledFunction>
+  <core>2</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_ping_simulator_2</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>ping_simulator</calledFunction>
+  <core>3</core>
+  <inPar/>
+</task>
+<connection>
+  <ends>
+    <end task="_task_ping_task_timeout_0" type="chan"/>
+    <end task="_task_distance_consumer_1" type="chan"/>
+  </ends>
+  <name>c</name>
+</connection>
+</taskgraph>

@@ -1,0 +1,33 @@
+/*
+ * Lab07-BFS.xc
+ *
+ *  Created on: Oct 31, 2017
+ *      Author: kenda
+ */
+#include <stdio.h>
+#include <print.h>
+#include <string.h>
+#include "bfs.h"
+int main(){
+    const int obstacles[ELEMENT_COUNT]= {
+            0,0,0,0,0,
+            0,0,0,1,0,
+            1,1,0,1,0,
+            0,0,0,1,0,
+            0,0,1,0,0
+    };
+    int start_rank = RANK(3,0);
+    int goal_rank = RANK(4,4);
+    int AStarFlag = 0; //0 to use BFS
+    int heuristicFlag = 1; // 0 = Euclidian Distance, 1 = Manhattan Distance
+
+    //Experiments performed with Manhattan & Euclidian Heuristics:
+    find_shortest_path(start_rank, goal_rank, obstacles, AStarFlag, heuristicFlag);
+    AStarFlag = 1;
+    find_shortest_path(start_rank, goal_rank, obstacles, AStarFlag, heuristicFlag);
+    heuristicFlag = 0;
+    find_shortest_path(start_rank, goal_rank, obstacles, AStarFlag, heuristicFlag);
+
+
+}
+

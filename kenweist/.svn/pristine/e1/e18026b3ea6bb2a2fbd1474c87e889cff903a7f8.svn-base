@@ -1,0 +1,425 @@
+/*
+ * HW04-MultiMotor.xc
+ *
+ *  Created on: Oct 7, 2017
+ *      Author: kenda
+ */
+
+
+#include <xs1.h>
+#include <print.h>
+#include <stdio.h>
+
+#define RIGHT_CCW 0b0010
+#define RIGHT_CW 0b1000
+
+#define LEFT_CCW 0b0100
+#define LEFT_CW 0b0001
+
+out port oSTB = XS1_PORT_1O;
+out port oMotorControl = XS1_PORT_4D;
+out port oMotorPWMA = XS1_PORT_1P;
+out port oMotorPWMB = XS1_PORT_1I;
+in port iEncoder = XS1_PORT_4C;
+out port oLED1 = XS1_PORT_1A;
+out port oLED2 = XS1_PORT_1D;
+
+#define TICKS_PER_US (XS1_TIMER_HZ/1000000)
+#define TICKS_PER_MS (XS1_TIMER_HZ/1000)
+#define PWM_FRAME_TICKS TICKS_PER_MS
+#define TICKS_PER_SEC XS1_TIMER_HZ
+
+#define DRIVER_HIGH 100
+#define DRIVER_LOW -100
+#define MOTOR_HIGH 1
+#define MOTOR_LOW 0
+#define ENCODER_TWO 2
+#define ENCODER_ONE 1
+#define LED_HIGH 1
+#define LED_LOW 0
+#define ENCODER_BTWO 0b0010
+#define ENCODER_BONE 0b0001
+
+typedef struct{
+    int left_duty_cycle;
+    int right_duty_cycle;
+}motor_cmd_t;
+
+
+
+void driver_task(chanend out_motor_cmd_chan, int increment, unsigned int delay_ticks){
+//Function prototype implemented as described^
+
+   unsigned t,flagL = 1, flagR = 1;
+   timer tmr;
+
+   //Duty Cycles Start at 0
+   motor_cmd_t dutyCycle;
+   dutyCycle.left_duty_cycle = 0;
+   dutyCycle.right_duty_cycle = 0;
+
+    while(1){
+
+        //Function Sends a motor_cmd_t across the channel
+        out_motor_cmd_chan <: dutyCycle;
+        tmr :> t;
+        t+= delay_ticks;
+
+        //Function pauses for delay_ticks before repeating
+        tmr when timerafter(t) :> void;
+
+        //Handle Left Motor's Oscillation between 100 and -100
+        if((dutyCycle.left_duty_cycle + increment >= DRIVER_HIGH) && flagL == 1){
+            flagL = 0;
+            dutyCycle.left_duty_cycle = DRIVER_HIGH;
+
+        }
+        else if ((dutyCycle.left_duty_cycle - increment <= DRIVER_LOW) && flagL == 0){
+            flagL = 1;
+            dutyCycle.left_duty_cycle = DRIVER_LOW;
+
+        }
+       //Function Increments Duty Cycle for Left Motor
+        else if(flagL == 1){
+            dutyCycle.left_duty_cycle += increment;
+
+        }
+        else if (flagL == 0){
+            dutyCycle.left_duty_cycle -=  increment;
+
+        }
+
+
+        //Handle Right Motor's Oscillation between 100 and -100
+        if((dutyCycle.right_duty_cycle + increment >= DRIVER_HIGH) && flagR == 1){
+            flagR = 0;
+            dutyCycle.right_duty_cycle = DRIVER_HIGH;
+
+        }
+        else if ((dutyCycle.right_duty_cycle - increment <= DRIVER_LOW) && flagR == 0){
+            flagR = 1;
+            dutyCycle.right_duty_cycle = DRIVER_LOW;
+
+        }
+        //Function Increments Duty Cycle for Right Motor
+        else if(flagR == 1){
+            dutyCycle.right_duty_cycle += increment;
+
+            }
+        else if (flagR == 0){
+            dutyCycle.right_duty_cycle -=  increment;
+
+        }
+
+
+    }
+
+
+
+}
+
+
+void motor_task(out port oMotorPWM, out port oMotorControl, unsigned int cw_mask, unsigned int ccw_mask, chanend in_motor_cmd_chan){
+
+       timer tmr,tmr1;
+       unsigned t,t1,timeToGo = 0;
+       int duty_cycle = 0;
+       int holder;
+       unsigned frameHigh;// = (duty_cycle*PWM_FRAME_TICKS)/100;
+
+
+
+       oMotorControl <: cw_mask;
+       oSTB <: 1;
+
+       while(1){
+
+           if(duty_cycle < 0){
+               duty_cycle *= -1;
+           }
+
+           frameHigh = (duty_cycle*PWM_FRAME_TICKS)/100;
+           timeToGo = 0;
+
+           oMotorPWM <: 1;
+           tmr :> t;
+           tmr1 :> t1;
+
+           t += frameHigh;
+           t1 += PWM_FRAME_TICKS;
+
+           while(timeToGo == 0){
+
+               select{
+                   case tmr when timerafter(t) :> t:
+                       oMotorPWM <: 0;
+                       t += XS1_TIMER_HZ;
+                       break;
+
+                   case tmr1 when timerafter(t1) :> t1:
+                       timeToGo = 1;
+
+                       break;
+
+                   case in_motor_cmd_chan :> holder:
+                       if(holder < 0){
+                           duty_cycle = holder;
+                           oMotorControl <: ccw_mask;
+                       }
+                       else if(holder > 0){
+                           duty_cycle = holder;
+                           oMotorControl <: cw_mask;
+                       }
+                       break;
+               }
+
+           }
+
+      }
+
+}
+void multi_motor_task(out port oLeftPWM, out port oRightPWM, out port oMotorControl, chanend in_motor_cmd_chan){
+//Function prototype implemented as described^
+
+    motor_cmd_t dutyCycle;
+    timer tmrL, tmrL1, tmrR;
+    unsigned tL,tL1, tR, timeToGo = 0;
+    unsigned frameHighL, frameHighR;
+    unsigned left = LEFT_CW , right = RIGHT_CW;
+    dutyCycle.left_duty_cycle = 0;
+    dutyCycle.right_duty_cycle = 0;
+
+    oSTB <: 1;
+    oMotorControl <: left|right;
+
+    while(1){
+
+        //Used to send correct duty cycles
+        if(dutyCycle.left_duty_cycle < 0){
+            dutyCycle.left_duty_cycle  *= -1;
+         }
+        if(dutyCycle.right_duty_cycle < 0){
+            dutyCycle.right_duty_cycle *= -1;
+         }
+
+        frameHighL = (dutyCycle.left_duty_cycle*PWM_FRAME_TICKS)/100;
+        frameHighR = (dutyCycle.right_duty_cycle*PWM_FRAME_TICKS)/100;
+        timeToGo = 0;
+
+        oLeftPWM <: MOTOR_HIGH;
+        oRightPWM <: MOTOR_HIGH;
+
+        tmrL :> tL;
+        tmrL1 :> tL1;
+
+        tmrR :> tR;
+
+
+        //used for frames for left and right
+        tL += frameHighL;
+        tR += frameHighR;
+
+        tL1 += PWM_FRAME_TICKS;
+
+
+        while(timeToGo == 0){
+            //Used to run both motors simulateously
+            select{
+                //Converts duty cycle percentages to timeouts
+                case tmrL when timerafter(tL) :> tL:
+                    oLeftPWM <: MOTOR_LOW;
+                    tL += XS1_TIMER_HZ;
+                    break;
+
+                case tmrR when timerafter(tR) :> tR:
+                    oRightPWM <: MOTOR_LOW;
+                    tR += XS1_TIMER_HZ;
+                    break;
+
+                    //TimeOut case
+                case tmrL1 when timerafter(tL1) :> tL1:
+                    timeToGo = 1;
+                    break;
+
+                    //Reads motor_cmd_t commands from the channel w/o effecting duty cycle
+                case in_motor_cmd_chan :> dutyCycle:
+                    left = 0;
+                    right = 0;
+
+                    //Sets Motor Directions from duty cycle ercentages
+                    if(dutyCycle.left_duty_cycle < 0 ){
+                        left = LEFT_CCW;
+                    }
+                    else if(dutyCycle.left_duty_cycle > 0){
+                        left = LEFT_CW;
+                    }
+                    if (dutyCycle.right_duty_cycle < 0){
+                        right = RIGHT_CCW;
+                    }
+                    else if(dutyCycle.right_duty_cycle > 0){
+                        right = RIGHT_CW;
+                    }
+                    //Send correct motor directions
+                    oMotorControl <: left | right;
+                    break;
+            }
+
+        }
+
+    }
+
+}
+
+void encoder_task(in port iEncoder, out port oLED1, out port oLED2, chanend outputChan){
+    //Function prototype is implemented as described^
+
+    unsigned output = 0, prevOutput;
+
+    iEncoder :> output;
+    prevOutput = output;
+
+    while(1){
+
+        //Function listens for changes on given port
+        iEncoder when pinsneq(output) :> output;
+
+        if((output & ENCODER_BTWO) != (prevOutput & ENCODER_BTWO)){
+            //Light up appropriate LED
+            oLED2 <: LED_HIGH;
+            //Report changes on the channel
+            outputChan <: ENCODER_TWO;
+            prevOutput = output;
+        }
+        else {
+            oLED2 <: LED_LOW;
+        }
+
+        if((output & ENCODER_BONE) != (prevOutput & ENCODER_BONE)){
+            //Light up appropriate LED
+            oLED1 <: LED_HIGH;
+            //Report changes on the channel
+            outputChan <: ENCODER_ONE;
+            prevOutput = output;
+        }
+        else{
+            oLED1 <: LED_LOW;
+        }
+    }
+}
+
+void goStraightNSigs(chanend out_motor_cmd_chan, chanend encoderChan, int n){
+
+    motor_cmd_t motors;
+    motors.left_duty_cycle = 36;
+    motors.right_duty_cycle = 34;
+
+    unsigned encodeVal = 0, numRotesL = 0,numRotesR = 0;
+
+    while(1){
+        out_motor_cmd_chan <: motors;
+        encoderChan :> encodeVal;
+        if(encodeVal == 1){
+            numRotesL++;
+        }
+        if(encodeVal == 2){
+            numRotesR++;
+        }
+        //Runs the servos for n/8 signals (so in this case we have 5 full rotations)
+        if(numRotesL >= n || numRotesR >= n){
+            motors.left_duty_cycle = 0;
+            motors.right_duty_cycle = 0;
+            out_motor_cmd_chan <: motors;
+            break;
+        }
+
+    }
+
+
+
+
+}
+
+void turn(chanend out_motor_cmd_chan, chanend encoderChan, int direction){
+    //0 = right
+    //1 = left
+
+    motor_cmd_t dutyCycle;
+    unsigned encodeVal = 0, numRotes = 0;
+    if(direction == 0){
+        //stop right wheel
+        dutyCycle.right_duty_cycle = 0;
+        dutyCycle.left_duty_cycle = 35;
+
+    }
+    else{
+        //stop left wheel
+        dutyCycle.left_duty_cycle = 0;
+        dutyCycle.right_duty_cycle = 35;
+    }
+
+    while(1){
+    out_motor_cmd_chan <: dutyCycle;
+    encoderChan :> encodeVal;
+
+    if(encodeVal == 1 && direction ==1){
+        //Left
+        numRotes++;
+    }
+    if(encodeVal == 2 && direction ==0){
+        //Right
+        numRotes++;
+    }
+    if(numRotes > 10){
+        dutyCycle.left_duty_cycle = 0;
+        dutyCycle.right_duty_cycle = 0;
+        out_motor_cmd_chan <: dutyCycle;
+        break;
+    }
+
+    }
+
+}
+
+void square_task(chanend out_motor_cmd_chan, chanend encoderChan){
+    //Function prototype implemented as described^
+
+    //1 side = 5 full rotations = 40 total signals
+
+    timer tmr;
+    int t;
+
+    tmr :> t;
+    t+= 2*XS1_TIMER_HZ;
+
+    tmr when timerafter(t):> void;
+
+    //Uses servos to drive car straight using additional function
+    goStraightNSigs(out_motor_cmd_chan, encoderChan, 40);
+
+    //Turns the car ~90 degrees depending on the testing surface
+    turn(out_motor_cmd_chan, encoderChan,0); //0 = right, 1 = left
+
+    //Above functions repeated to complete the square:
+    goStraightNSigs(out_motor_cmd_chan, encoderChan, 40);
+    turn(out_motor_cmd_chan, encoderChan,0);
+    goStraightNSigs(out_motor_cmd_chan, encoderChan, 40);
+    turn(out_motor_cmd_chan, encoderChan,0);
+    goStraightNSigs(out_motor_cmd_chan, encoderChan, 40);
+
+
+}
+int main(){
+    chan motor_cmd_chan;
+    chan encodeChan;
+       oSTB <: 1;
+
+       par{
+          // motor_task(oMotorPWMA, oMotorControl, LEFT_CW, LEFT_CCW, motor_cmd_chan);
+           //driver_task(motor_cmd_chan, 5, TICKS_PER_SEC/8);
+           square_task(motor_cmd_chan, encodeChan);
+           multi_motor_task(oMotorPWMA, oMotorPWMB, oMotorControl, motor_cmd_chan);
+           encoder_task(iEncoder, oLED1, oLED2, encodeChan);
+
+       }
+
+    return 0;}

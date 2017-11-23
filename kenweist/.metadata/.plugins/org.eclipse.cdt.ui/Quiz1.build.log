@@ -1,0 +1,19 @@
+14:52:59 **** Incremental Build of configuration Default for project Quiz1 ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing Quiz1.xc
+../src/Quiz1.xc:35:1: warning: control reaches end of non-void function [-Wreturn-type]
+}
+^
+Propagating analysis
+Creating dependencies for Quiz1.xc
+Compiling Quiz1.xc
+../src/Quiz1.xc:35:1: warning: control reaches end of non-void function [-Wreturn-type]
+}
+^
+Creating Quiz1.xe
+Build Complete
+
+14:53:02 Build Finished (took 2s.870ms)
+

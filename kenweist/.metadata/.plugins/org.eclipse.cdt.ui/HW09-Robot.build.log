@@ -1,0 +1,13 @@
+18:38:56 **** Incremental Build of configuration Default for project HW09-Robot ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing HW09-Robot.xc
+Propagating analysis
+Creating dependencies for HW09-Robot.xc
+Compiling HW09-Robot.xc
+Creating HW09-RobotActual.xe
+Build Complete
+
+18:39:03 Build Finished (took 7s.186ms)
+

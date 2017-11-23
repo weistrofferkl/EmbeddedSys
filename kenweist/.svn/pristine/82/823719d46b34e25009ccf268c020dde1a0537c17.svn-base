@@ -1,0 +1,12 @@
+<preCompilationAnalysis file="../src/Lab07-LinkedList.xc">
+<fDef name="main" global="true" noreturn="false" doNotSpecialize="false" numParams="0"/>
+<fCall name="test_main" global="true" numArgs="0">
+</fCall>
+<fCall name="printchar" global="true" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="intval"><intval isSigned="false" val="97"/></value>
+    </values>
+  </arg>
+</fCall>
+</preCompilationAnalysis>

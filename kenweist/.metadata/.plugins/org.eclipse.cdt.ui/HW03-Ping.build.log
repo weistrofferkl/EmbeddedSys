@@ -1,0 +1,13 @@
+10:17:05 **** Incremental Build of configuration Default for project HW03-Ping ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing HW03-Ping.xc
+Propagating analysis
+Creating dependencies for HW03-Ping.xc
+Compiling HW03-Ping.xc
+Creating HW03-Ping.xe
+Build Complete
+
+10:17:07 Build Finished (took 1s.849ms)
+

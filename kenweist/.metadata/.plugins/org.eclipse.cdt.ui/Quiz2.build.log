@@ -1,0 +1,22 @@
+15:16:13 **** Incremental Build of configuration Default for project Quiz2 ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing Quiz2.xc
+../src/Quiz2.xc:10:1: error: both 'unsigned' and 'float' in declaration specifiers
+unsigned float compute_difference(unsigned int t0, unsigned int t1){
+^~~~~~~~~~~~~~
+../src/Quiz2.xc:28:20: error: unknown function identifier `pinseq' (possibly missing prototype?)
+        iPort when pinseq (1) :> void;
+                   ^
+../src/Quiz2.xc:38:25: error: use of undeclared identifer `totalTime'
+        return hightime/totalTime;
+                        ^
+../src/Quiz2.xc:50:1: error: parse error before '}' token
+}
+^
+xmake[1]: *** [.build/src/Quiz2.xc.pca.xml.decouple] Error 1
+xmake: *** [analyze] Error 2
+
+15:16:14 Build Finished (took 1s.249ms)
+

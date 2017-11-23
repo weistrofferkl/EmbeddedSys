@@ -1,0 +1,101 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>button_listener_task</name>
+  <inFunction>button_listener_task</inFunction>
+</task>
+<task>
+  <name>button_simulator</name>
+  <inFunction>button_simulator</inFunction>
+</task>
+<task>
+  <name>worker</name>
+  <inFunction>worker</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+<task>
+  <name>_task_button_listener_task_0</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>button_listener_task</calledFunction>
+  <core>1</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_worker_1</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>worker</calledFunction>
+  <core>2</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_worker_2</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>worker</calledFunction>
+  <core>3</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_worker_3</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>worker</calledFunction>
+  <core>4</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_button_simulator_4</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>button_simulator</calledFunction>
+  <core>5</core>
+  <inPar/>
+</task>
+<connection>
+  <ends>
+    <end task="_task_button_listener_task_0" type="chan"/>
+    <end task="_task_worker_3" type="chan"/>
+  </ends>
+  <name>one</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_button_listener_task_0" type="chan"/>
+    <end task="_task_worker_1" type="chan"/>
+  </ends>
+  <name>two</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_worker_1" type="chan"/>
+    <end task="_task_worker_2" type="chan"/>
+  </ends>
+  <name>three</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_worker_2" type="chan"/>
+    <end task="_task_worker_3" type="chan"/>
+  </ends>
+  <name>four</name>
+</connection>
+</taskgraph>

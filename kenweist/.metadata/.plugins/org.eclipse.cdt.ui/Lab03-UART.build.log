@@ -1,0 +1,8 @@
+21:30:31 **** Incremental Build of configuration Default for project Lab03-UART ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+21:30:31 Build Finished (took 716ms)
+

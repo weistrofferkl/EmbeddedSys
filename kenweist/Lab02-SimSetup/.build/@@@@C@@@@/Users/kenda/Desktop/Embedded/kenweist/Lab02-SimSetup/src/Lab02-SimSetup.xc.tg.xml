@@ -1,0 +1,50 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>test</name>
+  <inFunction>test</inFunction>
+  <endOfSeqCalledFunction>printstr</endOfSeqCalledFunction>
+</task>
+<task>
+  <name>monitor_button</name>
+  <inFunction>monitor_button</inFunction>
+</task>
+<task>
+  <name>button_simulator</name>
+  <inFunction>button_simulator</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+<task>
+  <name>_task_monitor_button_0</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>monitor_button</calledFunction>
+  <core>1</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_button_simulator_1</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>button_simulator</calledFunction>
+  <core>2</core>
+  <inPar/>
+</task>
+</taskgraph>

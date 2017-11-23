@@ -1,0 +1,12 @@
+19:05:18 **** Incremental Build of configuration Default for project Lab04-Encoder ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing Lab04-Encoder.xc
+Creating dependencies for Lab04-Encoder.xc
+Compiling Lab04-Encoder.xc
+Creating Lab04-Encoder.xe
+Build Complete
+
+19:05:20 Build Finished (took 2s.218ms)
+

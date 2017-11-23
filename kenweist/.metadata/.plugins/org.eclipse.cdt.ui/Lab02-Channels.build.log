@@ -1,0 +1,8 @@
+17:08:40 **** Incremental Build of configuration Default for project Lab02-Channels ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+17:08:41 Build Finished (took 1s.101ms)
+

@@ -1,0 +1,12 @@
+10:04:32 **** Incremental Build of configuration Default for project Lab07-LinkedList ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Analyzing bfs.c
+Creating dependencies for bfs.c
+Compiling bfs.c
+Creating Lab07-LinkedList.xe
+Build Complete
+
+10:04:35 Build Finished (took 3s.718ms)
+

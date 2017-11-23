@@ -1,0 +1,756 @@
+/*
+    INSIDE HW09
+ * bfs.c
+ *
+ *  Created on: Oct 30, 2017
+ *      Author: kenda
+ */
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <print.h>
+#include <math.h>
+#include "bfs.h"
+
+struct list_element_t_struct;
+
+struct list_element_t_struct{
+    int rank;
+    int f;
+    int g;
+    int h;
+    struct list_element_t_struct*next;
+
+};
+
+typedef struct list_element_t_struct list_element_t;
+
+typedef struct{
+    list_element_t *head;
+    list_element_t *tail;
+}list_t;
+
+
+void push_back(list_t* list, int rank);
+void free_list(list_t* list);
+int remove_front(list_t* list);
+void push_front(list_t* list, int rank);
+void fill_neighbors(int neighbors[], int rank);
+void sortNeighbors(int array[]);
+int heuristicGen(int curNode, int goalRank, int manDistFlag);
+int convert_commands(list_t* ranks, int commands[]);
+
+
+list_t init_list(){
+    //should declare a new list_t variable
+    //make sure both head and tail are null and return the thing
+    list_t newListEle;
+    newListEle.head = NULL;
+    newListEle.tail = NULL;
+
+    return newListEle;
+}
+
+void push_back(list_t* list, int rank){
+    list_element_t* tmp;
+    list_element_t* holder;
+
+    tmp = (list_element_t*)malloc(sizeof(list_element_t));
+    assert(tmp != NULL);
+    tmp->rank = rank;
+    tmp->next = NULL;
+    if(list->head == NULL && list->tail == NULL){
+        list->head = tmp;
+        list->tail = tmp;
+    }
+    else{
+        holder = list->head;
+        while(holder != NULL){
+            if(holder->next == NULL){
+                holder->next = tmp;
+                list->tail = tmp;
+                break;
+            }
+            else{
+                holder = holder->next;
+            }
+        }
+    }
+}
+
+void free_list(list_t* list){
+    list_element_t* holder;
+  //  list_element_t* tmp;
+    holder = list->head;
+
+    while(holder != NULL){
+
+        list->head = list->head->next;
+        free(holder);
+        holder = list->head;
+    }
+    *list = init_list();
+
+
+}
+
+int remove_front(list_t* list){
+    //if list is empty return -1
+    //remove first element
+    //deallocate that memory for first element
+    //fix head and tail pointers
+    //if last element is removed then reinitalize list
+    list_element_t* tmp;
+    tmp = list->head;
+
+    int holder;
+    if(tmp == NULL){
+        holder =  NEG_ONE;
+    }
+    else if (tmp->next == NULL){
+        list->head = NULL;
+        list->tail = NULL;
+        holder = tmp->rank;
+        free(tmp);
+        *list = init_list();
+    }
+    else{
+        list->head = tmp->next;
+        holder = tmp->rank;
+        free(tmp);
+    }
+    return holder;
+}
+
+void push_front(list_t* list, int rank){
+
+    list_element_t* tmp;
+    tmp = (list_element_t*)malloc(sizeof(list_element_t));
+    tmp->rank = rank;
+    tmp->next = NULL;
+
+    if(list->head == NULL && list->tail == NULL){
+        list->head = tmp;
+        list->tail = tmp;
+    }
+    else{
+        tmp->next = list->head;
+        list->head = tmp;
+    }
+}
+
+//push to list in increasing order
+void push_in_order(list_t* list, int newRank, int f, int g, int h){
+    list_element_t *newNode = (list_element_t*)malloc(sizeof(list_element_t));
+    newNode->rank = newRank;
+    newNode->f = f;
+    newNode->g = g;
+    newNode->h = h;
+
+    if(list->head == NULL && list->tail == NULL){
+        list-> head = newNode;
+        list->tail = newNode;
+    }
+    if(list->head->f >= f){
+        //inserting a smallest element
+        newNode->next = list->head;
+        list->head = newNode;
+    }else{
+        list_element_t *temp = (list_element_t*)malloc(sizeof(list_element_t));
+        temp = list->head;
+
+        while(temp->next != NULL && temp->next->f < f){
+            //go to correct insertion place
+            temp = temp->next;
+        }
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+}
+void fill_neighbors(int neighbors[], int rank){
+    //0 = top
+    //1 = bottom
+    //2 = left
+    //3 = right
+
+    //10*10 grid
+
+    int row = ROW(rank);
+    int col = COL(rank);
+  //  int top,bottom,left,right;
+
+    //top
+    if(row == ZERO){
+        neighbors[ZERO] = NEG_ONE;
+    }
+    else{
+        neighbors[ZERO] = RANK(row-ONE, col);
+    }
+
+    //bottom
+    if(row == LAST_ROW){
+        neighbors[ONE] = NEG_ONE;
+    }
+    else{
+        neighbors[ONE] = RANK(row+ONE, col);
+    }
+
+    //left
+    if(col == ZERO){
+        neighbors[TWO] = NEG_ONE;
+    }
+    else{
+        neighbors[TWO] = RANK(row, col-ONE);
+    }
+
+    //right
+    if(col == LAST_ROW){
+        neighbors[THREE] = NEG_ONE;
+    }
+    else{
+        neighbors[THREE] = RANK(row, col+ONE);
+    }
+
+    if(col-1 < ZERO){neighbors[TWO] = NEG_ONE;} //left
+    if(col+2 > MAZE_WIDTH){neighbors[THREE] = NEG_ONE;} //right
+    if(row-1 < ZERO){neighbors[ZERO] = NEG_ONE;} //up
+    if(row+2 > MAZE_WIDTH){neighbors[ONE] = NEG_ONE;} //down
+}
+//Used Bubble Sort from earlier assignment:
+void sortNeighbors(int array[]){
+
+    int i,j;
+        for(i = 0; i<NUM_NEIGHBORS;i++){
+            for(j =0; j<NUM_NEIGHBORS-i;j++){
+                if(array[j] > array[j+1]){
+
+                    int temp = array[j];
+                    array[j] = array[j+1];
+                    array[j+1] = temp;
+                }
+            }
+        }
+
+
+}
+
+//Experiments with Manhattan and Euclidian Heuristics:
+int heuristicGen(int curNode, int goalRank, int manDistFlag){
+
+    int heuristic = ZERO;
+    // x = col number
+    // y = row number
+    if(manDistFlag == ONE){ //use manhattan heuristic
+        //(|curNode.x - goalNode.x|, |curNode.y - goalNode.y|)
+        int xDif = abs(COL(curNode) - COL(goalRank));
+        int yDif = abs(ROW(curNode) - ROW(goalRank));
+        heuristic = (xDif + yDif);
+    }
+    else{ //use euclidian heuristic
+       //sqrt( (curNode.x - goalNode.x)^2 + (curNode.y - goalNode.y)^2 )
+        int xDif = abs(COL(curNode) - COL(goalRank));
+        int yDif = abs(ROW(curNode) - ROW(goalRank));
+
+        xDif = xDif*xDif;
+        yDif = yDif*yDif;
+
+        heuristic = (xDif+yDif); //1*(int) sqrt
+    }
+    return heuristic;
+}
+
+//remove an element from the front of the list, but unlike removeHead,
+//this does not return a rank, but rather the list element itself
+list_element_t* popElement(list_t *list){
+    list_element_t *prevHead = (list_element_t*)malloc(sizeof(list_element_t));
+    prevHead = list->head;
+    list->head = list->head->next;
+    return prevHead;
+
+}
+
+//Used to check if a list contains a certain value
+//will return -1 if not in the current list, or will
+//return the value if it is within the current list
+int containsVal(list_t list, int val){
+    list_element_t *temp;
+    temp = list.head;
+
+    while(temp != NULL){
+        if(temp->rank == val){
+            return val;
+        }
+        temp = temp->next;
+
+    }
+    return NEG_ONE;
+}
+
+// I looked at http://web.mit.edu/eranki/www/tutorials/search/ for help understanding
+// what to do for this version of A* (using a linked list)
+// A lot of this is similar to my BFS implementation but I found it easier to just create
+// a new method as I got confused initially with the open/closed list Matt refers to in the description
+// I believe Mong and Cole may have used the same article to understand this part of the assignment,
+// so I'm assuming that our code will/may look super similar.
+
+void find_path_AStar(int start_rank, int goal_rank, const int obstacles[], int AStarFlag, int ManhattanDistFlag){
+    int predecessors[ELEMENT_COUNT];
+
+    for(int i = 0; i<ELEMENT_COUNT; i++){
+            if(obstacles[i] == ONE){
+                predecessors[i] = NEG_TWO;
+            }
+            else{
+                predecessors[i] = NEG_ONE;
+            }
+        }
+
+    predecessors[start_rank] = start_rank;
+
+    //essentially the predecessors array but this makes it easier to go with Matt's description
+    //and that I found in the MIT article
+    list_t openList;
+    openList = init_list();
+
+    list_t closedList;
+    closedList = init_list();
+
+    //push the starting rank node to the front of the list in order
+    push_front(&openList, start_rank);
+    push_in_order(&openList, start_rank, ZERO,ZERO,ZERO);
+
+    while(openList.head != NULL){
+        list_element_t *cNode = popElement(&openList);
+
+       int currentRank = cNode->rank;
+
+       if(currentRank == goal_rank){
+           break;
+       }
+       int prevGCost = cNode->g;
+
+
+       int neighbors[NUM_NEIGHBORS];
+       fill_neighbors(neighbors, currentRank);
+
+       for(int i = 0; i< NUM_NEIGHBORS; i++){
+
+           //We want to skip the obstacles and out of bounds neighbors
+           if(neighbors[i] == NEG_ONE || predecessors[neighbors[i]] == NEG_TWO){
+               continue;
+           }
+               int curGCost, curHCost;
+
+               //F = G+H;
+               curGCost = prevGCost + ONE; //Add one since we can only move in 4 directions
+               curHCost = heuristicGen(neighbors[i], goal_rank, ManhattanDistFlag);
+               int curFCost = curGCost + curHCost;
+
+               int checkOpen = containsVal(openList, neighbors[i]);
+               int checkClosed = containsVal(closedList, neighbors[i]);
+
+               if(checkOpen != NEG_ONE){
+                   //only want to push the smaller FCosts, so we skip
+                   //those that are greater than or already included in the openList
+                   if(checkOpen <= curFCost){
+                       continue;
+                   }
+               }
+               if(checkClosed != NEG_ONE){
+                   //only want to push the smaller FCosts
+                   //only push those that we haven't accounted for in the closedList
+                   if(checkClosed <= curFCost){
+                       continue;
+                   }
+               }
+               //Nodes added to open list ordered given heuristic
+               else{
+                   push_in_order(&openList, neighbors[i], curFCost, curGCost,curHCost);
+                   predecessors[neighbors[i]] = currentRank;
+
+               }
+
+           }
+
+       push_back(&closedList, currentRank);
+
+    }
+
+
+    free_list(&openList);
+    free_list(&closedList);
+
+
+    //Print out the stuff;
+    list_t list;
+    list = init_list();
+
+    int i = goal_rank;
+    push_front(&list, goal_rank);
+
+           while(1){
+               if(i == start_rank){
+                   push_front(&list, i);
+                   break;
+               }
+               else{
+                   push_front(&list, i);
+                   i = predecessors[i];
+               }
+           }
+
+       int headRank;
+       unsigned r, c;
+       //print out sequence of cells:
+       printf("A* ");
+       if(ManhattanDistFlag == ZERO){
+           printf("with Euclidian Distance: \n");
+       }
+       else{
+           printf("with Manhattan Distance: \n");
+       }
+       int pathLengthCounter = ZERO;
+       while(list.head->next != NULL){
+           headRank = remove_front(&list);
+           pathLengthCounter++;
+           r = ROW(headRank);
+           c = COL(headRank);
+           printf("( %u , %u )\n", r, c);
+       }
+       printf("TOTAL NODES: %u\n\n", pathLengthCounter);
+       free_list(&list);
+
+
+}
+
+//Function prototype implemented as described
+void find_shortest_path(int start_rank, int goal_rank, const int obstacles[], int AStarFlag, int ManhattanDistFlag, int command_holder[]){
+
+    //Used if we're testing A*
+    if(AStarFlag == ONE){
+        find_path_AStar(start_rank, goal_rank,obstacles,AStarFlag,ManhattanDistFlag);
+    }
+    //Otherwise, use BFS:
+    else{
+
+        int predecessors[ELEMENT_COUNT];
+
+        for(int i = 0; i<ELEMENT_COUNT; i++){
+            if(obstacles[i] == ONE){
+                predecessors[i] = NEG_TWO;
+            }
+            else{
+                predecessors[i] = NEG_ONE;
+            }
+        }
+
+        predecessors[start_rank] = start_rank;
+
+        //Uses LinkedList DS that we developed in the previous lab section of assignment 7 to run BFS:
+        list_t list;
+        list = init_list();
+        push_front(&list, start_rank);
+        int neighbors[NUM_NEIGHBORS];
+
+        while(1){
+
+           // list_element_t *currentNode = remove_front(&list);
+           int maybeGoal = remove_front(&list);
+
+
+            if(maybeGoal == goal_rank){
+                   break;
+            }
+
+            fill_neighbors(neighbors, maybeGoal);
+
+                if(neighbors[ZERO] != NEG_ONE && predecessors[neighbors[ZERO]] == NEG_ONE){
+                    push_back(&list, neighbors[ZERO]);
+                    predecessors[neighbors[ZERO]] = maybeGoal;
+                    //update element in predecessors to have the rank being considered
+
+                }
+                if(neighbors[ONE] != NEG_ONE && predecessors[neighbors[ONE]] == NEG_ONE){
+                    push_back(&list, neighbors[ONE]);
+                    predecessors[neighbors[ONE]] = maybeGoal;
+                    //update element in predecessors to have the rank being considered
+
+                }
+                if(neighbors[TWO] != NEG_ONE && predecessors[neighbors[TWO]] == NEG_ONE){
+                    push_back(&list, neighbors[TWO]);
+                    predecessors[neighbors[TWO]] = maybeGoal;
+                    //update element in predecessors to have the rank being considered
+
+                }
+                if(neighbors[THREE] != NEG_ONE && predecessors[neighbors[THREE]] == NEG_ONE){
+                    push_back(&list, neighbors[THREE]);
+                    predecessors[neighbors[THREE]] = maybeGoal;
+                    //update element in predecessors to have the rank being considered
+
+                }
+
+        }
+
+        //Ensures All Memory is Correctly Freed #1:
+        free_list(&list);
+        list = init_list();
+
+        int i = goal_rank;
+            while(1){
+                if(i == start_rank){
+                    push_front(&list, i);
+                    break;
+                }
+                else{
+                    push_front(&list, i);
+                    i = predecessors[i];
+                }
+            }
+
+            int headRank;
+            unsigned r, c;
+            //print out sequence of cells:
+            printf("BFS: \n");
+            int pathLengthCounter = 0;
+
+        //    list_t extraList;
+        //    extraList = init_list();
+        //    extraList = list;
+
+            //Prints out shortest path from start to goal:
+
+      /*      while(list.head != NULL){
+                headRank = remove_front(&list);
+                pathLengthCounter++;
+                r = ROW(headRank);
+                c = COL(headRank);
+                printf("( %u , %u )\n", r, c);
+            }
+            printf("TOTAL NODES: %u\n\n", pathLengthCounter);*/
+
+            int commands[ELEMENT_COUNT];
+
+            convert_commands(&list, commands);
+            printf("LAST MOVE IN ARRAY: %i\n", commands[1]);
+
+
+            //Ensures All Memory is Correctly Freed #2:
+            free_list(&list);
+    }
+}
+int convert_commands(list_t* ranks, int commands[]){
+    //convert each rank into row/col
+    //convert each row/col into directiosn based on current grid cell
+    //int commands[pathLength];
+    int curPosition = remove_front(ranks);
+    int curRow = ROW(curPosition);
+    int curCol = COL(curPosition);
+
+    int nextPosition;
+    int nextRow;
+    int nextCol;
+    int colDif;
+    int rowDif;
+
+    //1 = north
+    //2 = south
+    //3 = west
+    //4 = east
+    int startFlag = 0;
+    int curDirection = 3;
+    int nextDirection = 3; // start west
+    int difDirection=0;
+    int i = 0;
+
+    while(ranks->head != NULL){
+        nextPosition = remove_front(ranks);
+        nextRow = ROW(nextPosition);
+        nextCol = COL(nextPosition);
+
+        colDif = curCol - nextCol;
+        rowDif = curRow - nextRow;
+
+
+        if(colDif == 1){
+            //go right
+       //     printf("GO EAST\n");
+            nextDirection = 3;
+
+        }
+        else if(colDif == -1){
+            //go left
+        //    printf("GO WEST\n");
+            nextDirection = 4;
+        }
+        else if(rowDif == 1){
+            //go up
+        //    printf("GO NORTH\n");
+            nextDirection = 1;
+        }
+        else if(rowDif == -1){
+            //go down
+          //  printf("GO SOUTH\n");
+            nextDirection = 2;
+        }
+
+        if(startFlag == 0){
+            curDirection = 3;
+            nextDirection = 3;
+            startFlag = 1;
+        }
+
+        difDirection = curDirection - nextDirection;
+
+        if(difDirection == 0){
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+
+        }
+        //West -> south = 4-2
+        else if(curDirection == 3 && nextDirection == 2 ){
+            //turn from east to south
+            printf("TURN LEFT\n");
+            commands[i] = TURN_LEFT;
+            i++;
+           printf("GO FORWARDS\n");
+           commands[i] = GO_FORWARD;
+           i++;
+
+        }
+        //west -> North
+        else if(curDirection == 3 && nextDirection == 1){
+            printf("TURN RIGHT\n");
+            commands[i] = TURN_RIGHT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+        //east -> south
+        else if(curDirection == 4 && nextDirection == 2){
+            printf("TURN RIGHT\n");
+            commands[i] = TURN_RIGHT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+        //east -> north
+        else if(curDirection == 4 && nextDirection == 1){
+            printf("TURN LEFT\n");
+            commands[i] = TURN_LEFT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+
+        //north -> east
+        else if(curDirection == 1 && nextDirection == 4){
+            printf("TURN RIGHT\n");
+            commands[i] = TURN_RIGHT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+
+        //nort -> west
+        else if(curDirection == 1 && nextDirection == 3){
+            printf("TURN LEFT\n");
+            commands[i] = TURN_LEFT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+
+        //south -> east
+        else if(curDirection == 2 && nextDirection == 4){
+            printf("TURN LEFT\n");
+            commands[i] = TURN_LEFT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+        else if(curDirection == 2 && nextDirection == 3){
+            printf("TURN RIGHT\n");
+            commands[i] = TURN_RIGHT;
+            i++;
+            printf("GO FORWARDS\n");
+            commands[i] = GO_FORWARD;
+            i++;
+        }
+        //south -> west
+
+
+
+        curDirection = nextDirection;
+        curPosition = nextPosition;
+        curCol = nextCol;
+        curRow = nextRow;
+
+    }
+
+    return commands;
+}
+int test_main(){
+
+    list_t l1;
+    l1 = init_list();
+
+    //int neighborTest[4];
+
+   // l1 = init_list();
+  //  assert(l1.head == l1.tail && l1.head == NULL);
+
+
+ /*   l1 = init_list();
+    push_back(&l1, 10);
+    assert(l1.head != NULL);
+    assert(l1.tail == l1.head);
+    assert(l1.head->rank == 10);
+    assert(l1.head->next == NULL);
+
+    push_back(&l1, 20);
+    assert(l1.head != l1.tail);
+    assert(l1.head->rank == 10);
+    assert(l1.head->next == l1.tail);
+    assert(l1.tail->rank == 20);
+    assert(l1.tail->next == NULL);
+ */
+   /* l1 = init_list();
+    push_back(&l1, 10);
+    push_back(&l1, 20);
+    push_back(&l1, 30);
+    free_list(&l1);
+    assert(l1.head == NULL && l1.tail == l1.head);
+    */
+
+  /*  push_back(&l1, 10);
+    push_back(&l1, 20);
+    push_back(&l1, 30);
+    remove_front(&l1);
+    assert(l1.head->rank == 20);
+    remove_front(&l1);
+    assert(l1.head->rank == 30);
+    remove_front(&l1);
+    assert(l1.head == NULL && l1.tail == l1.head);
+    */
+ /*   push_back(&l1, 10);
+ //   push_back(&l1, 20);
+ //   push_back(&l1, 30);
+    push_front(&l1, 40);
+    assert(l1.head->rank == 40 && l1.tail == l1.head);
+    assert(l1.tail->rank == 40);*/
+/*
+    fill_neighbors(neighborTest, RANK(7,7));
+    assert(neighborTest[0] != -1);
+    assert(neighborTest[2] != -1);
+    assert(neighborTest[1] != -1);
+    assert(neighborTest[3] != -1);
+*/
+    return 0;
+}

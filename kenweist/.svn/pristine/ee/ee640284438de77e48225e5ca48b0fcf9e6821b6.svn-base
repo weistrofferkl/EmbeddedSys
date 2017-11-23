@@ -1,0 +1,418 @@
+/*
+ * HW04-MultiMotor.xc
+ *
+ *  Created on: Oct 7, 2017
+ *      Author: kenda
+ */
+
+
+#include <xs1.h>
+#include <print.h>
+#include <stdio.h>
+
+#define RIGHT_CCW 0b0010
+#define RIGHT_CW 0b1000
+
+#define LEFT_CCW 0b0100
+#define LEFT_CW 0b0001
+
+out port oSTB = XS1_PORT_1O;
+out port oMotorControl = XS1_PORT_4D;
+out port oMotorPWMA = XS1_PORT_1P;
+out port oMotorPWMB = XS1_PORT_1I;
+in port iEncoder = XS1_PORT_4C;
+out port oLED1 = XS1_PORT_1A;
+out port oLED2 = XS1_PORT_1D;
+
+#define TICKS_PER_US (XS1_TIMER_HZ/1000000)
+#define TICKS_PER_MS (XS1_TIMER_HZ/1000)
+#define PWM_FRAME_TICKS TICKS_PER_MS
+#define TICKS_PER_SEC XS1_TIMER_HZ
+
+typedef struct{
+    int left_duty_cycle;
+    int right_duty_cycle;
+}motor_cmd_t;
+
+
+void driver_task(chanend out_motor_cmd_chan, int increment, unsigned int delay_ticks){
+
+
+   unsigned t,flagL = 1, flagR = 1;
+   //int duty = 0;
+   timer tmr;
+   char buffer[64];
+
+
+   motor_cmd_t dutyCycle;
+   dutyCycle.left_duty_cycle = 0;
+   dutyCycle.right_duty_cycle = 0;
+
+    while(1){
+
+        out_motor_cmd_chan <: dutyCycle;
+        tmr :> t;
+        t+= delay_ticks;
+
+        tmr when timerafter(t) :> void;
+
+        if((dutyCycle.left_duty_cycle + increment >= 100) && flagL == 1){
+            flagL = 0;
+            dutyCycle.left_duty_cycle = 100;
+
+        }
+        else if ((dutyCycle.left_duty_cycle - increment <= -100) && flagL == 0){
+            flagL = 1;
+            dutyCycle.left_duty_cycle = -100;
+
+        }
+        else if(flagL == 1){
+            dutyCycle.left_duty_cycle += increment;
+
+        }
+        else if (flagL == 0){
+            dutyCycle.left_duty_cycle -=  increment;
+
+        }
+
+
+        if((dutyCycle.right_duty_cycle + increment >= 100) && flagR == 1){
+            flagR = 0;
+            dutyCycle.right_duty_cycle = 100;
+
+        }
+        else if ((dutyCycle.right_duty_cycle - increment <= -100) && flagR == 0){
+            flagR = 1;
+            dutyCycle.right_duty_cycle = -100;
+
+        }
+        else if(flagR == 1){
+            dutyCycle.right_duty_cycle += increment;
+
+            }
+        else if (flagR == 0){
+            dutyCycle.right_duty_cycle -=  increment;
+
+        }
+
+
+    }
+
+
+
+}
+
+
+void motor_task(out port oMotorPWM, out port oMotorControl, unsigned int cw_mask, unsigned int ccw_mask, chanend in_motor_cmd_chan){
+
+       timer tmr,tmr1;
+       unsigned t,t1,timeToGo = 0;
+       int duty_cycle = 0;
+       int holder;
+       unsigned frameHigh;// = (duty_cycle*PWM_FRAME_TICKS)/100;
+
+
+
+       oMotorControl <: cw_mask;
+       oSTB <: 1;
+
+       while(1){
+
+           if(duty_cycle < 0){
+               duty_cycle *= -1;
+           }
+
+           frameHigh = (duty_cycle*PWM_FRAME_TICKS)/100;
+           timeToGo = 0;
+
+           oMotorPWM <: 1;
+           tmr :> t;
+           tmr1 :> t1;
+
+           t += frameHigh;
+           t1 += PWM_FRAME_TICKS;
+
+           while(timeToGo == 0){
+
+               select{
+                   case tmr when timerafter(t) :> t:
+                       oMotorPWM <: 0;
+                       t += XS1_TIMER_HZ;
+                       break;
+
+                   case tmr1 when timerafter(t1) :> t1:
+                       timeToGo = 1;
+
+                       break;
+
+                   case in_motor_cmd_chan :> holder:
+                       if(holder < 0){
+                           duty_cycle = holder;
+                           oMotorControl <: ccw_mask;
+                       }
+                       else if(holder > 0){
+                           duty_cycle = holder;
+                           oMotorControl <: cw_mask;
+                       }
+                       break;
+               }
+
+           }
+
+      }
+
+}
+void multi_motor_task(out port oLeftPWM, out port oRightPWM, out port oMotorControl, chanend in_motor_cmd_chan){
+
+    motor_cmd_t dutyCycle;
+    timer tmrL, tmrL1, tmrR;
+    unsigned tL,tL1, tR, timeToGo = 0;
+    unsigned frameHighL, frameHighR;
+    unsigned left = LEFT_CW , right = RIGHT_CW;
+    unsigned dc;
+    dutyCycle.left_duty_cycle = 0;
+    dutyCycle.right_duty_cycle = 0;
+
+
+
+  //  printchar('b');
+    oSTB <: 1;
+    oMotorControl <: left|right;
+
+
+
+//    dutyCycle.left_duty_cycle = 0;
+ //   dutyCycle.right_duty_cycle = 0;
+
+
+   // printf("b");
+
+    while(1){
+
+        if(dutyCycle.left_duty_cycle < 0){
+            dutyCycle.left_duty_cycle  *= -1;
+         }
+        if(dutyCycle.right_duty_cycle < 0){
+            dutyCycle.right_duty_cycle *= -1;
+         }
+
+        frameHighL = (dutyCycle.left_duty_cycle*PWM_FRAME_TICKS)/100;
+        frameHighR = (dutyCycle.right_duty_cycle*PWM_FRAME_TICKS)/100;
+        timeToGo = 0;
+
+        oLeftPWM <: 1;
+        oRightPWM <:1;
+
+        tmrL :> tL;
+        tmrL1 :> tL1;
+
+        tmrR :> tR;
+
+
+        tL += frameHighL;
+        tR += frameHighR;
+
+        tL1 += PWM_FRAME_TICKS;
+
+
+        while(timeToGo == 0){
+
+            select{
+                case tmrL when timerafter(tL) :> tL:
+                    oLeftPWM <: 0;
+                    tL += XS1_TIMER_HZ;
+                    break;
+
+                case tmrR when timerafter(tR) :> tR:
+                    oRightPWM <: 0;
+                    tR += XS1_TIMER_HZ;
+                    break;
+
+                case tmrL1 when timerafter(tL1) :> tL1:
+                    timeToGo = 1;
+                    break;
+
+                case in_motor_cmd_chan :> dutyCycle:
+                    left = 0;
+                    right = 0;
+
+                    if(dutyCycle.left_duty_cycle < 0 ){
+                        left = LEFT_CCW;
+                    }
+                    else if(dutyCycle.left_duty_cycle > 0){
+                        left = LEFT_CW;
+                    }
+                    if (dutyCycle.right_duty_cycle < 0){
+                        right = RIGHT_CCW;
+                    }
+                    else if(dutyCycle.right_duty_cycle > 0){
+                        right = RIGHT_CW;
+                    }
+
+                    oMotorControl <: left | right;
+                    break;
+            }
+
+        }
+
+    }
+
+}
+
+void encoder_task(in port iEncoder, out port oLED1, out port oLED2, chanend outputChan){
+    //monitor iencoder port, light LEDs oLED1 when 1 and 0 is off
+
+    unsigned output = 0, prevOutput;
+
+    iEncoder :> output;
+    prevOutput = output;
+
+    while(1){
+
+       // iEncoder :> output;
+        iEncoder when pinsneq(output) :> output;
+
+        if((output & 0b0010) != (prevOutput & 0b0010)){
+            oLED2 <: 1;
+            outputChan <: 2;
+            prevOutput = output;
+        }
+        else {
+            oLED2 <: 0;
+        }
+
+        if((output & 0b0001) != (prevOutput & 0b0001)){
+            oLED1 <: 1;
+            outputChan <: 1;
+            prevOutput = output;
+        }
+        else{
+            oLED1 <: 0;
+        }
+    }
+}
+
+void goStraightNSigs(chanend out_motor_cmd_chan, chanend encoderChan, int n){
+
+    motor_cmd_t motors;
+    motors.left_duty_cycle = 36;
+    motors.right_duty_cycle = 34;
+
+    unsigned encodeVal = 0, numRotesL = 0,numRotesR = 0;
+    //unsigned prevL = motors.left_duty_cycle , prevR = motors.right_duty_cycle;
+
+    char buffer[64];
+
+    while(1){
+
+    /*    sprintf(buffer, "LEFT ROTATIONS %u \n", numRotesL);
+        printstr(buffer);
+        sprintf(buffer, "Right ROTATIONS %u \n", numRotesR);
+        printstr(buffer);*/
+
+        out_motor_cmd_chan <: motors;
+   //     printchar('a');
+        encoderChan :> encodeVal;
+   //     printchar('c');
+        if(encodeVal == 1){
+            numRotesL++;
+        }
+        if(encodeVal == 2){
+            numRotesR++;
+        }
+        if(numRotesL >= n || numRotesR >= n){
+            motors.left_duty_cycle = 0;
+            motors.right_duty_cycle = 0;
+            out_motor_cmd_chan <: motors;
+            break;
+        }
+
+    }
+
+
+
+
+}
+
+void turn(chanend out_motor_cmd_chan, chanend encoderChan, int direction){
+    //0 =  right
+    //1 = left
+
+    motor_cmd_t dutyCycle;
+    unsigned encodeVal = 0, numRotes = 0;
+    if(direction == 0){
+        //stop right wheel
+        dutyCycle.right_duty_cycle = 0;
+        dutyCycle.left_duty_cycle = 35;
+
+    }
+    else{
+        dutyCycle.left_duty_cycle = 0;
+        dutyCycle.right_duty_cycle = 35;
+    }
+
+    while(1){
+    out_motor_cmd_chan <: dutyCycle;
+    encoderChan :> encodeVal;
+
+    if(encodeVal == 1 && direction ==1){
+        //Left
+        numRotes++;
+    }
+    if(encodeVal == 2 && direction ==0){
+        //Right
+        numRotes++;
+    }
+    if(numRotes > 10){
+        dutyCycle.left_duty_cycle = 0;
+        dutyCycle.right_duty_cycle = 0;
+        out_motor_cmd_chan <: dutyCycle;
+        break;
+    }
+
+    }
+
+}
+
+void square_task(chanend out_motor_cmd_chan, chanend encoderChan){
+    //connected via channels to encoder task and to motor controller task
+            //out_motor_cmd_chan = motor controller task
+           //encoderChan = encoder task
+    //1 side = 5 full rotations = 40 total signals
+    char buffer[64];
+
+    timer tmr;
+    int t;
+
+    tmr :> t;
+    t+= 2* XS1_TIMER_HZ;
+
+    tmr when timerafter(t):> void;
+
+  //  sprintf(buffer, "After initial wait\n");
+  //  printstr(buffer);
+    goStraightNSigs(out_motor_cmd_chan, encoderChan, 20);
+ //   turn(out_motor_cmd_chan, encoderChan,0); //0 = right, 1 = left
+ //   goStraightNSigs(out_motor_cmd_chan, encoderChan, 20);
+ //   turn(out_motor_cmd_chan, encoderChan,0);
+ //   goStraightNSigs(out_motor_cmd_chan, encoderChan, 20);
+ //   turn(out_motor_cmd_chan, encoderChan,0);
+ //   goStraightNSigs(out_motor_cmd_chan, encoderChan, 20);
+
+
+}
+int main(){
+    chan motor_cmd_chan;
+    chan encodeChan;
+       oSTB <: 1;
+
+       par{
+          // motor_task(oMotorPWMA, oMotorControl, LEFT_CW, LEFT_CCW, motor_cmd_chan);
+           //driver_task(motor_cmd_chan, 5, TICKS_PER_SEC/8);
+           square_task(motor_cmd_chan, encodeChan);
+           multi_motor_task(oMotorPWMA, oMotorPWMB, oMotorControl, motor_cmd_chan);
+           encoder_task(iEncoder, oLED1, oLED2, encodeChan);
+
+       }
+
+    return 0;}

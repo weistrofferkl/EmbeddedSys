@@ -1,0 +1,8 @@
+12:06:15 **** Incremental Build of configuration Default for project Lab02-SimSetup ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+12:06:16 Build Finished (took 972ms)
+

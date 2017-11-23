@@ -1,0 +1,6 @@
+<taskgraph>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+</taskgraph>

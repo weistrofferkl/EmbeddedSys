@@ -1,0 +1,163 @@
+<taskgraph>
+<task>
+  <name>delay_seconds</name>
+  <inFunction>delay_seconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_milliseconds</name>
+  <inFunction>delay_milliseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>delay_microseconds</name>
+  <inFunction>delay_microseconds</inFunction>
+  <calledFunction>delay_ticks_longlong</calledFunction>
+</task>
+<task>
+  <name>_safe_memcmp</name>
+  <inFunction>_safe_memcmp</inFunction>
+</task>
+<task>
+  <name>_safe_memmove</name>
+  <inFunction>_safe_memmove</inFunction>
+</task>
+<task>
+  <name>_safe_memset</name>
+  <inFunction>_safe_memset</inFunction>
+</task>
+<task>
+  <name>uart_transmit_byte</name>
+  <inFunction>uart_transmit_byte</inFunction>
+</task>
+<task>
+  <name>uart_receive_byte</name>
+  <inFunction>uart_receive_byte</inFunction>
+</task>
+<task>
+  <name>uart_transmit_bytes</name>
+  <inFunction>uart_transmit_bytes</inFunction>
+</task>
+<task>
+  <name>toggle_port</name>
+  <inFunction>toggle_port</inFunction>
+</task>
+<task>
+  <name>line</name>
+  <inFunction>line</inFunction>
+  <endOfSeqCalledFunction>uart_transmit_bytes</endOfSeqCalledFunction>
+</task>
+<task>
+  <name>multi_motor_task</name>
+  <inFunction>multi_motor_task</inFunction>
+</task>
+<task>
+  <name>encoder_task</name>
+  <inFunction>encoder_task</inFunction>
+</task>
+<task>
+  <name>goStraightNSigs_ticks</name>
+  <inFunction>goStraightNSigs_ticks</inFunction>
+</task>
+<task>
+  <name>turn_ticks</name>
+  <inFunction>turn_ticks</inFunction>
+</task>
+<task>
+  <name>move_car</name>
+  <inFunction>move_car</inFunction>
+</task>
+<task>
+  <name>formatCommand</name>
+  <inFunction>formatCommand</inFunction>
+</task>
+<task>
+  <name>uart_to_console_task</name>
+  <inFunction>uart_to_console_task</inFunction>
+</task>
+<task>
+  <name>send_hello_world_program</name>
+  <inFunction>send_hello_world_program</inFunction>
+  <endOfSeqCalledFunction>line</endOfSeqCalledFunction>
+</task>
+<task>
+  <name>send_wifi_setup</name>
+  <inFunction>send_wifi_setup</inFunction>
+  <endOfSeqCalledFunction>line</endOfSeqCalledFunction>
+</task>
+<task>
+  <name>output_task</name>
+  <inFunction>output_task</inFunction>
+</task>
+<task>
+  <name>main</name>
+  <inFunction>main</inFunction>
+</task>
+<task>
+  <name>_task_uart_to_console_task_0</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>uart_to_console_task</calledFunction>
+  <core>1</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_output_task_1</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>output_task</calledFunction>
+  <core>2</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_multi_motor_task_2</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>multi_motor_task</calledFunction>
+  <core>3</core>
+  <inPar/>
+</task>
+<task>
+  <name>_task_encoder_task_3</name>
+  <inFunction>main</inFunction>
+  <parent>main</parent>
+  <calledFunction>encoder_task</calledFunction>
+  <core>4</core>
+  <inPar/>
+</task>
+<connection>
+  <ends>
+    <end task="_task_uart_to_console_task_0" type="chan"/>
+    <end task="_task_output_task_1" type="chan"/>
+  </ends>
+  <name>connectorChan</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_uart_to_console_task_0" type="chan"/>
+    <end task="_task_multi_motor_task_2" type="chan"/>
+  </ends>
+  <name>motor_cmd_chan</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_uart_to_console_task_0" type="chan"/>
+    <end task="_task_encoder_task_3" type="chan"/>
+  </ends>
+  <name>encoderChan</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_uart_to_console_task_0" type="chan"/>
+    <end task="_task_encoder_task_3" type="chan"/>
+  </ends>
+  <name>encodeTicks</name>
+</connection>
+<connection>
+  <ends>
+    <end task="_task_uart_to_console_task_0" type="chan"/>
+    <end task="_task_output_task_1" type="chan"/>
+  </ends>
+  <name>fuckWifi</name>
+</connection>
+</taskgraph>

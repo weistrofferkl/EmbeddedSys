@@ -1,0 +1,8 @@
+15:29:19 **** Incremental Build of configuration Default for project Lab07-MCU9250Test ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+15:29:20 Build Finished (took 1s.618ms)
+

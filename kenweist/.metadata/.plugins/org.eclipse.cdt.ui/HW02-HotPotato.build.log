@@ -1,0 +1,8 @@
+16:12:52 **** Incremental Build of configuration Default for project HW02-HotPotato ****
+xmake CONFIG=Default all 
+Checking build modules
+No build modules used.
+Build Complete
+
+16:12:53 Build Finished (took 1s.133ms)
+
